@@ -27,6 +27,7 @@ RDMZ:
  Chip Design (FE):
     veri4
     GL/<project_name>/<version>
+    icd_builds
 
  Chip Design (BE):
     backend3/<project_name>
@@ -156,6 +157,9 @@ case "$workdir" in
 		;;
 	backend4/[a-z]* | hertmp2/[a-z]* | hertmp3/[a-z]* | hertmp4/[a-z]* )
 		zfs_workdir /mnt/mtlzfs01_${workdir} $user layout 755
+		;;
+	icd_builds )
+		zfs_workdir /mnt/mtlzfs01_${workdir} $user mtl 755
 		;;
 	swgwork|vmgwork )
 		netapp_workdir labfs01 /mnt/labfs01_${workdir} $user mtl 755
