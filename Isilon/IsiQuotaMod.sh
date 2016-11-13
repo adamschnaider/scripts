@@ -48,6 +48,12 @@ resize_check $size
 ## If size entered is OK, change 'g' to upper case
 size=$(echo $size | tr '[:lower:]' '[:upper:]')
 
+## Check if quota entered is less than current quota
+if [ $(ssh 10.5.1.1 isi quota quotas list --user=${username} --format=csv | grep $dir | awk -F',' '{print $5}') -gt ${size%%G*} ]; then
+	echo -e "Error: Quota entered is less than current user quota"
+	exit 1
+fi
+
 ## Quota modification
 
 [[ $(ssh 10.5.1.1 isi quota quotas view  --user=${username} --type=$(echo $QUOTA|awk '{print $1}') --path=$(echo $QUOTA|awk '{print $3}')|grep Linked | awk '{print $2}') == "Yes" ]] && ssh 10.5.1.1 isi quota quotas modify --user=${username} --type=$(echo $QUOTA|awk '{print $1}') --path=$(echo $QUOTA|awk '{print $3}') --linked=no

@@ -501,3 +501,40 @@ Sun Oct 30 18:52:36 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[904]: -I-
 Sun Oct 30 18:52:36 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[904]: -I- TRYING TO REMOVE MOUNTPOINT /mnt/mtlfs03_adams_test_904
 Sun Oct 30 18:52:36 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[904]: -I- REMOVED MOUNTPOINT /mnt/mtlfs03_adams_test_904
 Sun Oct 30 18:52:36 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[904]: -I- AUTOMATIC CLEANER TESTING END
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- AUTOMATIC CLEANER TESTING START
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- NFS PATH IS SET TO mtlfs03.yok.mtl.com:/vol/adams_test, MOUNTPOINT IS SET TO /mnt/mtlfs03_adams_test_10879
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- TRYING TO CREATE MOUNTPOINT /mnt/mtlfs03_adams_test_10879
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- MOUNTPOINT /mnt/mtlfs03_adams_test_10879 CREATED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- TRYING TO MOUNT NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /mnt/mtlfs03_adams_test_10879...
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- TRYING TO CREATE USER LOG DIRECTORY directory_cleaner.log/USER
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- MOUNTED NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO  /mnt/mtlfs03_adams_test_10879 CREATED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- CHECKING PROJECT /mnt/mtlfs03_adams_test_10879/project1 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user1 - /mnt/mtlfs03_adams_test_10879/project1/user1 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user1 /mnt/mtlfs03_adams_test_10879/project1/user1 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user2 - /mnt/mtlfs03_adams_test_10879/project1/user2 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user2 /mnt/mtlfs03_adams_test_10879/project1/user2 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user3 - /mnt/mtlfs03_adams_test_10879/project1/user3 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user3 /mnt/mtlfs03_adams_test_10879/project1/user3 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- PROJECT=project1 /mnt/mtlfs03_adams_test_10879/project1 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- CHECKING PROJECT /mnt/mtlfs03_adams_test_10879/project2 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user1 - /mnt/mtlfs03_adams_test_10879/project2/user1 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user1 /mnt/mtlfs03_adams_test_10879/project2/user1 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user2 - /mnt/mtlfs03_adams_test_10879/project2/user2 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user2 /mnt/mtlfs03_adams_test_10879/project2/user2 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user3 - /mnt/mtlfs03_adams_test_10879/project2/user3 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user3 /mnt/mtlfs03_adams_test_10879/project2/user3 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- PROJECT=project2 /mnt/mtlfs03_adams_test_10879/project2 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- CHECKING PROJECT /mnt/mtlfs03_adams_test_10879/project3 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user1 - /mnt/mtlfs03_adams_test_10879/project3/user1 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user1 /mnt/mtlfs03_adams_test_10879/project3/user1 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user2 - /mnt/mtlfs03_adams_test_10879/project3/user2 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user2 /mnt/mtlfs03_adams_test_10879/project3/user2 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  CHECKING USER=user3 - /mnt/mtlfs03_adams_test_10879/project3/user3 DIRECTORY
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I-  USER=user3 /mnt/mtlfs03_adams_test_10879/project3/user3 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- PROJECT=project3 /mnt/mtlfs03_adams_test_10879/project3 CHECK FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- HERTMP3 CLEANING PROCEDURE FINISHED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- TRYING TO UNMOUNT /mnt/mtlfs03_adams_test_10879 
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- /mnt/mtlfs03_adams_test_10879 UNMOUNTED
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- TRYING TO REMOVE MOUNTPOINT /mnt/mtlfs03_adams_test_10879
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- REMOVED MOUNTPOINT /mnt/mtlfs03_adams_test_10879
+Wed Nov  9 16:49:48 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[10879]: -I- AUTOMATIC CLEANER TESTING END

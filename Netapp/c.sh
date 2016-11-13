@@ -15,4 +15,4 @@ echo "HI"
 #netapp_7mode_vol_resize 	mtvfs02 Vmware_Datastore_MTV_01 +50G
 #netapp_7mode_vol_resize	mtdkfs01	mtdk_share
 #netapp_7mode_vol_resize		labfs02	LIT
-netapp_7mode_vol_resize		$1	$2	$3
+netapp_7mode_vol_resize		$1	$2	$3	$4

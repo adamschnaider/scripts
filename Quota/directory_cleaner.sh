@@ -37,7 +37,10 @@ TEMP_FILE=$($MKTEMP)
 #NFS_PATH="10g.mtlisilon:/ifs/MLNX_DATA/hertmp3";
 #NFS_PATH="mtlzfs01.yok.mtl.com:/export/BE/hertmp3";
 NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
-TTL=0
+TTL=30
+FIRST_ALERT_TTL=15
+SECOND_ALERT_TTL=20
+LAST_ALERT_TTL=25
 #MountPoint="/mnt/hertmp3$$"
 MountPoint="/mnt/mtlfs03_adams_test_$$"
 ###############################################################################
@@ -59,6 +62,7 @@ fi
 . ${functions_path}/Contact_Management/contact_management_functions.bash
 
 . /root/scripts/functions/LogHandler.bash
+USERLOGFILEPATH="${LOGFILEPATH}/USER"
 sender="AUTOMATIC CLEANER TESTING"
 
 rotateLog
@@ -82,6 +86,13 @@ if ! /bin/mount ${NFS_PATH} ${MountPoint};then
     die
 fi
 
+# Create USER log directory
+wrLog "-I- TRYING TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
+if ! /bin/mkdir ${USERLOGFILEPATH}; then
+	wrLog "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
+	sendMail "${sender}" "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
+	die
+fi
 
 wrLog "-I- MOUNTED NFS PATH ${NFS_PATH} TO  ${MountPoint} CREATED"
 for project in $(ls ${MountPoint}/);do
@@ -96,29 +107,33 @@ wrLog "-I- CHECKING PROJECT ${MountPoint}/${project} DIRECTORY"
                                 continue
                         fi
             objectsAmount=0
-			filesAmount=0
+	    filesAmount=0
 
             objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime -${TTL} -print |wc -l)
+	    FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${FIRST_ALERT_TTL} -atime -${SECOND_ALERT_TTL} -print )
+	    STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${SECOND_ALERT_TTL} -atime -${LAST_ALERT_TTL} -print )
+	    LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${LAST_ALERT_TTL} -atime -{TTL} -print )
+
             # Delete whole area if all objects inside have not been accessed for last 7 days
-            if [ $objectsAmount -eq 0 ] ; then
-                wrLog "-I-      No objects found which were accessed during last $TTL days in ${MountPoint}/${project}/${user}/${area}"
-                wrLog "-D-      Deleting AREA=${MountPoint}/${project}/${user}/${area}"
-					if [ -d "${MountPoint}/${project}/${user}/${area}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" ] ;then
-						    /bin/rm -rf ${MountPoint}/${project}/${user}/${area}
-                        # go to next iteration since current area has been removed
-                        continue
-					fi
-            fi
+###            if [ $objectsAmount -eq 0 ] ; then
+###                wrLog "-I-      No objects found which were accessed during last $TTL days in ${MountPoint}/${project}/${user}/${area}"
+###                wrLog "-D-      Deleting AREA=${MountPoint}/${project}/${user}/${area}"
+###					if [ -d "${MountPoint}/${project}/${user}/${area}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" ] ;then
+###						    /bin/rm -rf ${MountPoint}/${project}/${user}/${area}
+###                        # go to next iteration since current area has been removed
+###                        continue
+###					fi
+###            fi
             wrLog "-I-      Will try to delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed for last $TTL days"
             # Delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed  area if all objects inside have not been accessed for last 7 days
             #for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime -${TTL} -print ) ; do
             # -${TTL} - File was accessed TTL days ago
             # ${TTL}  - Matches files accessed less than two days ago
-            for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime ${TTL} -print ) ; do
-                wrLog "-D-      Deleting file $fileToDel in AREA=${MountPoint}/${project}/${user}/${area}"
-			    /bin/rm -f ${fileToDel}
-            done
-            wrLog "-I-      DONE."
+###            for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime ${TTL} -print ) ; do
+###                wrLog "-D-      Deleting file $fileToDel in AREA=${MountPoint}/${project}/${user}/${area}"
+###			    /bin/rm -f ${fileToDel}
+###            done
+###            wrLog "-I-      DONE."
 
 			for cell in $(ls ${MountPoint}/${project}/${user}/${area}/);do
 				wrLog "-I-          CHECKING CELL=${cell}  ${MountPoint}/${project}/${user}/${area}/${cell} DIRECTORY"
