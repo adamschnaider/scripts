@@ -36,7 +36,8 @@ SELF_NAME=$($HOSTNAME -s)
                 DST_FILER=mtifseda
             ;;
             *)
-                NetAppList="mtlfs01 mtlfs03 labfs01 labfs02 manasfs1 manasfs2"
+                NetAppList="mtlfs01 mtlfs03 labfs01 labfs02 mtrlabfs01 mtrlabfs02 mtdkfs01 mtdkfs02 manasfs1 manasfs2"
+		NetAppCdotList="mtbufsprd-mtbufshw"
                 IsilonList="10g.mtlisilon"
                 ZFSList="mtlzfs01"
 		VNXList="vnx7600-cs0"
@@ -360,6 +361,66 @@ for filer in $NetAppList ; do
 done
 unset IFS
 }
+function getNetAppCdotQuotas()
+{
+tmpDIR=/tmp
+for filer in $NetAppCdotList ; do
+        IFS=$'\n'
+        host=$(echo $filer | awk -F'-' '{print $1}')
+	vserver=$(echo $filer | awk -F'-' '{print $2}')
+        for line in $(executeViaSSH admin@${host} "set -units KB; quota report -fields quota-type ,quota-target ,volume ,tree ,disk-used ,disk-limit -vserver ${vserver}" | tail  -n +4 | head -n -2) ; do
+                mainobjtype=$(/bin/echo ${line} | /bin/awk '{print $5}')
+                if [ $mainobjtype = "tree" ] ; then
+                        mainobjtype=directory
+                fi
+                if /bin/echo $mainobjtype | /bin/grep ':' -q ; then
+                        objtype=$(/bin/echo ${line} | /bin/awk '{print $1}' | /bin/awk -F':' '{print $1}')
+                else
+                        objtype=$mainobjtype
+                fi
+                if [ $objtype = "directory" ] ; then
+                        username=na
+                else
+                        username=$(/bin/echo ${line} | /bin/awk '{print $6}')
+                fi
+                path="/vol/$(/bin/echo ${line} | /bin/awk '{print $2}')/$(/bin/echo ${line} | /bin/awk '{print $4}')"
+                quota="$(/bin/echo ${line} | sed 's/KB//g' | /bin/awk '{print $8}')K"
+                used="$(/bin/echo ${line} | sed 's/KB//g' | /bin/awk '{print $7}')K"
+                if [[ ${quota} =~ - ]] ; then
+                        #echo "no quota defined"
+                        quota=1
+                        quotaUnlimited=1
+                fi
+                if [ "${used}X" = "0X" ] ; then
+                        usedPrcnt=0
+                else
+                        usedG=$(getScaleInG ${used})
+                        quotaG=$(getScaleInG ${quota})
+                        if [ "${usedG:0:1}" = "." ]
+                        then
+                                usedG="0${usedG}"
+                        fi
+                        if [ "${quotaG:0:1}" = "." ]
+                        then
+                                quotaG="0${quotaG}"
+                        fi
+                        if [ $(/bin/echo "${quotaG} == 0" | /usr/bin/bc -l) -eq 1 ] ; then
+                                usedPrcnt=100
+                        else
+                                usedPrcnt=$(/bin/echo "scale=2;${usedG} / ${quotaG} * 100" | /usr/bin/bc -l)
+                        fi
+                fi
+                if [ -z ${quotaUnlimited} ] ; then
+                        printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$vserver" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+                else
+                        printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$vserver" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+                fi
+                unset quotaUnlimited
+        done
+done
+unset IFS
+}
+
 function postActivities()
 {
 /bin/cp ${quota_file_path_tmp} ${quota_file_path}
@@ -370,6 +431,7 @@ initQuotaFile
 getVNXQuotas
 getZFSQuotas
 getNetAppQuotas
+getNetAppCdotQuotas
 getIsiQuotas
 postActivities
 /bin/rm -f $LOCKFILE
