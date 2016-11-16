@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. /root/scripts/functions/sizeHandler.bash
+
 ZFSHOST="mtlzfs01"
 
 usage() {
@@ -12,7 +14,7 @@ exit 1
 resize_check()
 {
 if ! [[ $(echo $size |grep '^[0-9]*[gG]$') ]]; then
-        echo -e "\n\e[31mError: The size you entered is invalid! Please try again\e[0m"
+        echo -e "\n\e[31mERROR: The size you entered is invalid! Please try again\e[0m"
         usage
 fi
 }
@@ -31,6 +33,9 @@ if [ "$#" -ne 2 ]; then
 	fi
 fi
 
+## Check user
+if ! ypmatch ${username} passwd > /dev/null 2>&1; then echo -e "ERROR: User doesn't exists" && exit 1; fi
+
 ## Find requested share and count
 count=0
 for share in $(ssh $ZFSHOST "shares select ICDesign list" | tail -n +5 | awk '{print $1}') ; do
@@ -38,16 +43,16 @@ for share in $(ssh $ZFSHOST "shares select ICDesign list" | tail -n +5 | awk '{p
 	[[ $? -eq 0 ]] && let count++
 done
 if [ $count -gt 1 ] ; then
-	echo -e "Error: More than one quota directory matching"
+	echo -e "ERROR: More than one quota directory matching"
 	exit 1
-	elif [ $count -eq 0 ] ; then
-		echo -e "Error: Quota directory wasn't found"
-		exit 1
+elif [ $count -eq 0 ] ; then
+	echo -e "ERROR: Quota directory wasn't found"
+	exit 1
 fi
 
 ## Quota fully detailed
-QUOTA=$(ssh $ZFSHOST shares select ICDesign select $dir users list | awk '{print "user" ,$2,$3,$4}' |grep $username)
-[[ -z $QUOTA ]] && echo -e "Error: No user quota for user $username on $dir" && exit 1
+QUOTA=$(ssh $ZFSHOST shares select ICDesign select $dir users list | awk -v directory=$dir '{print "user" ,$2,directory,$3,$4}' |grep $username)
+[[ -z $QUOTA ]] && echo -e "ERROR: No user quota for user $username on $dir" && exit 1
 
 ## Current quota
 echo -e "\e[032mCurrent quota:\e[0m"
@@ -58,6 +63,14 @@ echo "$QUOTA"
 
 ## Check size parameter
 resize_check $size
+
+## Check if quota entered is less than current quota
+current_quota=$(getScaleInG $(echo $QUOTA | awk '{print $5}')) && current_quota=${current_quota%%.*}
+current_used=$(getScaleInG $(echo $QUOTA | awk '{print $4}')) && current_used=${current_used%%.*}
+if [ $(echo $QUOTA | awk '{print $5}') != "-" -a $current_quota -gt ${size%%G*} ] || [ $(echo $QUOTA | awk '{print $5}') = "-" -a $current_used -gt ${size%%G*} ] ; then
+        echo -e "ERROR: Quota entered is less than current user quota"
+        exit 1
+fi
 
 ## Quota modification
 #ssh 10.5.1.1 isi quota quotas modify --user=${username} --type=user --path=$(echo $QUOTA|awk '{print $3}') --hard-threshold=${size} --advisory-threshold=${size}

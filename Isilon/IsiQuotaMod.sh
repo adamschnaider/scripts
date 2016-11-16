@@ -28,13 +28,13 @@ if [ "$#" -ne 2 ]; then
 fi
 
 ## Check user
-if ! ypmatch ${username} passwd > /dev/null 2>&1; then echo -e "Error: User doesn't exists" && exit 1; fi
+if ! ypmatch ${username} passwd > /dev/null 2>&1; then echo -e "ERROR: User doesn't exists" && exit 1; fi
 
 ## Check quota count
-[[ $(ssh 10.5.1.1 isi quota quotas list --user=${username} | grep $dir | wc -l) -ne 1 ]] && echo "Error: Quota problem, check details" && exit 1
+[[ $(ssh 10.5.1.1 isi quota quotas list --user=${username} | grep $dir | wc -l) -ne 1 ]] && echo "ERROR: Quota problem, check details" && exit 1
 
 ## Quota fully detailed
-QUOTA=$(ssh 10.5.1.1 isi quota quotas list --user=${username} | grep $dir)
+QUOTA=$(ssh 10.5.1.1 isi quota quotas list --user=${username} | grep $dir | awk '{print $1,$2,$3,$8,$5}')
 
 ## Current quota
 echo -e "\e[032mCurrent quota:\e[0m"
@@ -50,7 +50,7 @@ size=$(echo $size | tr '[:lower:]' '[:upper:]')
 
 ## Check if quota entered is less than current quota
 if [ $(ssh 10.5.1.1 isi quota quotas list --user=${username} --format=csv | grep $dir | awk -F',' '{print $5}') -gt ${size%%G*} ]; then
-	echo -e "Error: Quota entered is less than current user quota"
+	echo -e "ERROR: Quota entered is less than current user quota"
 	exit 1
 fi
 
