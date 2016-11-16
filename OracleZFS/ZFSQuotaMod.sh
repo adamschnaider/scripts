@@ -73,7 +73,6 @@ if [ $(echo $QUOTA | awk '{print $5}') != "-" -a $current_quota -gt ${size%%G*} 
 fi
 
 ## Quota modification
-#ssh 10.5.1.1 isi quota quotas modify --user=${username} --type=user --path=$(echo $QUOTA|awk '{print $3}') --hard-threshold=${size} --advisory-threshold=${size}
 ssh $ZFSHOST shares select ICDesign select $dir users select $username set quota=${size} >/dev/null 2>&1
 
 echo -e "\nNew quota:"
