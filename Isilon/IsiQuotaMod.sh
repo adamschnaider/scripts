@@ -8,7 +8,7 @@ exit 1
 resize_check()
 {
 if ! [[ $(echo $size |grep '^[0-9]*[gG]$') ]]; then
-        echo -e "\n\e[31mERROR: The size you entered is invalid! Please try again\e[0m"
+        echo -e "\nERROR: The size you entered is invalid! Please try again"
         usage
 fi
 }
@@ -37,7 +37,7 @@ if ! ypmatch ${username} passwd > /dev/null 2>&1; then echo -e "ERROR: User does
 QUOTA=$(ssh 10.5.1.1 isi quota quotas list --user=${username} | grep $dir | awk '{print $1,$2,$3,$8,$5}')
 
 ## Current quota
-echo -e "\e[032mCurrent quota:\e[0m"
+echo -e "Current quota:"
 echo "$QUOTA"
 
 ## Continue if size was entered
@@ -60,5 +60,5 @@ fi
 
 ssh 10.5.1.1 isi quota quotas modify --user=${username} --type=user --path=$(echo $QUOTA|awk '{print $3}') --hard-threshold=${size} --advisory-threshold=${size}
 
-echo -e "\n\e[032mNew quota:\e[0m"
+echo -e "\nNew quota:"
 ssh 10.5.1.1 isi quota quotas list --user=${username} --type=user --path=$(echo $QUOTA|awk '{print $3}') --no-footer --no-header

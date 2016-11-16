@@ -14,7 +14,7 @@ exit 1
 resize_check()
 {
 if ! [[ $(echo $size |grep '^[0-9]*[gG]$') ]]; then
-        echo -e "\n\e[31mERROR: The size you entered is invalid! Please try again\e[0m"
+        echo -e "\nERROR: The size you entered is invalid! Please try again"
         usage
 fi
 }
@@ -55,7 +55,7 @@ QUOTA=$(ssh $ZFSHOST shares select ICDesign select $dir users list | awk -v dire
 [[ -z $QUOTA ]] && echo -e "ERROR: No user quota for user $username on $dir" && exit 1
 
 ## Current quota
-echo -e "\e[032mCurrent quota:\e[0m"
+echo -e "Current quota:"
 echo "$QUOTA"
 
 ## Continue if size was entered
@@ -76,5 +76,5 @@ fi
 #ssh 10.5.1.1 isi quota quotas modify --user=${username} --type=user --path=$(echo $QUOTA|awk '{print $3}') --hard-threshold=${size} --advisory-threshold=${size}
 ssh $ZFSHOST shares select ICDesign select $dir users select $username set quota=${size} >/dev/null 2>&1
 
-echo -e "\n\e[032mNew quota:\e[0m"
+echo -e "\nNew quota:"
 ssh $ZFSHOST shares select ICDesign select $dir users list | awk '{print "user" ,$2,$3,$4}' |grep $username
