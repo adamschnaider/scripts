@@ -6,7 +6,7 @@ ZFSHOST="mtlzfs01"
 
 usage() {
 cat <<EOF
-Usage: $0 <username> <directory> [size in G]
+Usage: $0 <username> <directory> [size in G] [-f]
 EOF
 exit 1
 }
@@ -23,15 +23,10 @@ fi
 username=$1
 dir=$2
 size=$3
+[[ $4 == "-f" ]] && force=yes
 
-#[[ "$#" -ne 3 && "$#" -ne 2 ]] && usage
-if [ "$#" -ne 2 ]; then
-	if [ "$#" -eq 3 ]; then
-		resize_check $size
-	else
-		usage
-	fi
-fi
+[[ "$#" -gt 4 || "$#" -lt 2 ]] && usage
+[[ "$#" -eq 3 ]] && resize_check $size
 
 ## Check user
 if ! ypmatch ${username} passwd > /dev/null 2>&1; then echo -e "ERROR: User doesn't exists" && exit 1; fi
@@ -67,8 +62,8 @@ resize_check $size
 ## Check if quota entered is less than current quota
 current_quota=$(getScaleInG $(echo $QUOTA | awk '{print $5}')) && current_quota=${current_quota%%.*}
 current_used=$(getScaleInG $(echo $QUOTA | awk '{print $4}')) && current_used=${current_used%%.*}
-if [ $(echo $QUOTA | awk '{print $5}') != "-" -a $current_quota -gt ${size%%G*} ] || [ $(echo $QUOTA | awk '{print $5}') = "-" -a $current_used -gt ${size%%G*} ] ; then
-        echo -e "ERROR: Quota entered is less than current user quota"
+if ([ $(echo $QUOTA | awk '{print $5}') != "-" -a $current_quota -ge ${size%%G*} ] || [ $(echo $QUOTA | awk '{print $5}') = "-" -a $current_used -ge ${size%%G*} ]) &&  [ "$force" != "yes" ] ; then
+        echo -e "ERROR: Quota entered is less than OR equal to current user quota"
         exit 1
 fi
 

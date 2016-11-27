@@ -14,6 +14,8 @@ cat <<EOF
  LAB:
     fwgwork
     swgwork
+    fwshared_gwork
+    sw_mc_soc_gwork
     mgwork
     vmgwork
     sysgwork
@@ -161,7 +163,7 @@ case "$workdir" in
 	icd_builds )
 		zfs_workdir /mnt/mtlzfs01_${workdir} $user mtl 755
 		;;
-	swgwork|vmgwork )
+	swgwork|vmgwork|fwshared_gwork|sw_mc_soc_gwork )
 		netapp_workdir labfs01 /mnt/labfs01_${workdir} $user mtl 755
 		;;
 	fwgwork|mgwork|sysgwork|qa )

@@ -110,9 +110,9 @@ wrLog "-I- CHECKING PROJECT ${MountPoint}/${project} DIRECTORY"
 	    filesAmount=0
 
             objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime -${TTL} -print |wc -l)
-	    FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${FIRST_ALERT_TTL} -atime -${SECOND_ALERT_TTL} -print )
-	    STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${SECOND_ALERT_TTL} -atime -${LAST_ALERT_TTL} -print )
-	    LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${LAST_ALERT_TTL} -atime -{TTL} -print )
+	    FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${FIRST_ALERT_TTL} -type f -atime -${SECOND_ALERT_TTL} -print )
+	    STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${SECOND_ALERT_TTL} -type f -atime -${LAST_ALERT_TTL} -print )
+	    LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${LAST_ALERT_TTL} -type f -atime -{TTL} -print )
 
             # Delete whole area if all objects inside have not been accessed for last 7 days
 ###            if [ $objectsAmount -eq 0 ] ; then
