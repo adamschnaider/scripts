@@ -141,12 +141,12 @@ if [ -z $force ]; then
 fi
 
 case "$workdir" in
-	veri4 )
-		isilon_workdir /ifs/MLNX_DATA/FE/veri4/user $user mtl 755
-		;;
-	backend3/[a-z]* )
-		isilon_workdir /ifs/MLNX_DATA/${workdir} $user layout 755
-		;;
+#	veri4 )
+#		isilon_workdir /ifs/MLNX_DATA/FE/veri4/user $user mtl 755
+#		;;
+#	backend3/[a-z]* )
+#		isilon_workdir /ifs/MLNX_DATA/${workdir} $user layout 755
+#		;;
 	ip/[a-z]* )
 		isilon_workdir /ifs/MLNX_DATA/BE/${workdir} $user usr_ip 755
 		;;
@@ -159,6 +159,12 @@ case "$workdir" in
 		;;
 	backend4/[a-z]* | hertmp2/[a-z]* | hertmp3/[a-z]* | hertmp4/[a-z]* )
 		zfs_workdir /mnt/mtlzfs01_${workdir} $user layout 755
+		;;
+	backend3/[a-z]* )
+		zfs_workdir /mnt/mtlzfs02_${workdir} $user mtl 755
+		;;
+	veri4 )
+		zfs_workdir /mnt/mtlzfs02_${workdir}/user $user mtl 755
 		;;
 	icd_builds )
 		zfs_workdir /mnt/mtlzfs01_${workdir} $user mtl 755
