@@ -2,7 +2,7 @@
 
 . /root/scripts/functions/sizeHandler.bash
 
-ZFSHOST="mtlzfs01"
+ZFSHOSTS="mtlzfs01 mtlzfs02"
 
 usage() {
 cat <<EOF
@@ -33,10 +33,20 @@ if ! ypmatch ${username} passwd > /dev/null 2>&1; then echo -e "ERROR: User does
 
 ## Find requested share and count
 count=0
-for share in $(ssh $ZFSHOST "shares select ICDesign list" | tail -n +5 | awk '{print $1}') ; do
-	echo $share |grep -wq $dir
-	[[ $? -eq 0 ]] && let count++
+for host in $ZFSHOSTS; do
+	for share in $(ssh $host "shares list"); do
+		for filesystem in $(ssh $host shares select $share list | tail -n +5 | awk '{print $1}') ; do
+			echo $filesystem |grep -wq $dir
+			if [ $? -eq 0 ] ; then
+				let count++
+				HOST=$host
+				SHARE=$share
+				FILESYSTEM=$filesystem
+			fi
+		done
+	done
 done
+
 if [ $count -gt 1 ] ; then
 	echo -e "ERROR: More than one quota directory matching"
 	exit 1
@@ -46,7 +56,7 @@ elif [ $count -eq 0 ] ; then
 fi
 
 ## Quota fully detailed
-QUOTA=$(ssh $ZFSHOST shares select ICDesign select $dir users list | awk -v directory=$dir '{print "user" ,$2,directory,$3,$4}' |grep $username)
+QUOTA=$(ssh ${HOST} shares select ${SHARE} select ${FILESYSTEM} users list | awk -v directory=$dir '{print "user" ,$2,directory,$3,$4}' |grep $username)
 [[ -z $QUOTA ]] && echo -e "ERROR: No user quota for user $username on $dir" && exit 1
 
 ## Current quota
@@ -68,7 +78,7 @@ if ([ $(echo $QUOTA | awk '{print $5}') != "-" -a $current_quota -ge ${size%%G*}
 fi
 
 ## Quota modification
-ssh $ZFSHOST shares select ICDesign select $dir users select $username set quota=${size} >/dev/null 2>&1
+ssh $HOST shares select $SHARE select $FILESYSTEM users select $username set quota=${size} >/dev/null 2>&1
 
 echo -e "\nNew quota:"
-ssh $ZFSHOST shares select ICDesign select $dir users list | awk '{print "user" ,$2,$3,$4}' |grep $username
+ssh $HOST shares select $SHARE select $FILESYSTEM users list | awk '{print "user" ,$2,$3,$4}' |grep $username
