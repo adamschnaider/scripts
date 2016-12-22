@@ -15,4 +15,3 @@ IFS=$'\n'
 splitByDefault(){
 unset IFS
 }
-

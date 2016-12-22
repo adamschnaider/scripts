@@ -31,8 +31,6 @@ LOGSIZE=300
 #LOGFILEPATH=$(dirname $0)/hertmp3.cleaner.log
 #LOGFILEPATH=$(basename $0) && LOGFILEPATH=${LOGFILEPATH%%.*}.log
 USR_REVOKE_LIST=()
-#RECIPIENTS=yuribu@mellanox.com
-#RECIPIENTS=yuribu@mellanox.com,it_storage@mellanox.com
 TEMP_FILE=$($MKTEMP)
 #NFS_PATH="10g.mtlisilon:/ifs/MLNX_DATA/hertmp3";
 #NFS_PATH="mtlzfs01.yok.mtl.com:/export/BE/hertmp3";
@@ -41,6 +39,8 @@ TTL=30
 FIRST_ALERT_TTL=15
 SECOND_ALERT_TTL=20
 LAST_ALERT_TTL=25
+## Minimun file size to search (MB)
+MINSIZE="499M"
 #MountPoint="/mnt/hertmp3$$"
 MountPoint="/mnt/mtlfs03_adams_test_$$"
 ###############################################################################
@@ -49,8 +49,9 @@ functions_path="/home/yokadm/Monitors/functions"
 #contact_list_path="/mtlfs01/home/yokadm/Monitors/Contact_Groups"
 contact_list_path="/home/yokadm/Monitors/Contact_Groups"
 
-grp="IT_BASIC"
+#GROUP="IT_STORAGE"
 GROUP="IT_STORAGE_adams"
+
 # Sanity check
 host=$(hostname) && host=${host%%\.*}
 if [ $host != "sysmon" -a $host != "sysmon02" -a $host != "mtlstadm01" ];then
@@ -85,94 +86,94 @@ if ! /bin/mount ${NFS_PATH} ${MountPoint};then
 	sendMail "${sender}" "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}" $(getMails $GROUP)
     die
 fi
+wrLog "-I- MOUNTED NFS PATH ${NFS_PATH} TO ${MountPoint} CREATED"
 
 # Create USER log directory
-wrLog "-I- TRYING TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
-if ! /bin/mkdir ${USERLOGFILEPATH}; then
-	wrLog "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
-	sendMail "${sender}" "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
-	die
+if [ ! -d ${USERLOGFILEPATH} ];then
+	wrLog "-I- TRYING TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
+	if ! /bin/mkdir ${USERLOGFILEPATH}; then
+		wrLog "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
+		sendMail "${sender}" "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
+		die
+	fi
 fi
 
-wrLog "-I- MOUNTED NFS PATH ${NFS_PATH} TO  ${MountPoint} CREATED"
+splitByLines
 for project in $(ls ${MountPoint}/);do
-wrLog "-I- CHECKING PROJECT ${MountPoint}/${project} DIRECTORY"
+wrLog "-I- CHECKING PROJECT=${project} on  ${MountPoint}/${project} DIRECTORY"
 	for user in $(ls ${MountPoint}/${project}/);do
-		wrLog "-I-  CHECKING USER=${user} - ${MountPoint}/${project}/${user} DIRECTORY"
+		wrLog "-I- 	CHECKING USER=${user} on ${MountPoint}/${project}/${user} DIRECTORY"
 		for area in $(ls ${MountPoint}/${project}/${user}/);do
-			wrLog "-I-      CHECKING AREA=${area} ${MountPoint}/${project}/${user}/${area} DIRECTORY"
+			wrLog "-I- 		CHECKING AREA=${area} ${MountPoint}/${project}/${user}/${area} DIRECTORY"
                         # verify that area is not symbolic link poiting to non-hertmp3 area
                         if [ -L ${MountPoint}/${project}/${user}/${area} ] ; then
-                                wrLog "-W-      area=${area} is a symbolic link, skipping"
+                                wrLog "-W- 		AREA=${area} is a symbolic link, skipping"
                                 continue
                         fi
-            objectsAmount=0
-	    filesAmount=0
+            		objectsAmount=0
+			filesAmount=0
 
-            objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime -${TTL} -print |wc -l)
-	    FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${FIRST_ALERT_TTL} -type f -atime -${SECOND_ALERT_TTL} -print )
-	    STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${SECOND_ALERT_TTL} -type f -atime -${LAST_ALERT_TTL} -print )
-	    LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime +${LAST_ALERT_TTL} -type f -atime -${TTL} -print )
+			objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime -${TTL} -print |wc -l)
+			FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime +${FIRST_ALERT_TTL} -type f -atime -${SECOND_ALERT_TTL} -print )
+			STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime +${SECOND_ALERT_TTL} -type f -atime -${LAST_ALERT_TTL} -print )
+			LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime +${LAST_ALERT_TTL} -type f -atime -${TTL} -print )
 
-            # Delete whole area if all objects inside have not been accessed for last 7 days
-###            if [ $objectsAmount -eq 0 ] ; then
-###                wrLog "-I-      No objects found which were accessed during last $TTL days in ${MountPoint}/${project}/${user}/${area}"
-###                wrLog "-D-      Deleting AREA=${MountPoint}/${project}/${user}/${area}"
-###					if [ -d "${MountPoint}/${project}/${user}/${area}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" ] ;then
-###						    /bin/rm -rf ${MountPoint}/${project}/${user}/${area}
-###                        # go to next iteration since current area has been removed
-###                        continue
-###					fi
-###            fi
-            wrLog "-I-      Will try to delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed for last $TTL days"
-            # Delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed  area if all objects inside have not been accessed for last 7 days
-            #for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime -${TTL} -print ) ; do
-            # -${TTL} - File was accessed TTL days ago
-            # ${TTL}  - Matches files accessed less than two days ago
-###            for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime ${TTL} -print ) ; do
-###                wrLog "-D-      Deleting file $fileToDel in AREA=${MountPoint}/${project}/${user}/${area}"
-###			    /bin/rm -f ${fileToDel}
-###            done
-###            wrLog "-I-      DONE."
-
-			for cell in $(ls ${MountPoint}/${project}/${user}/${area}/);do
-				wrLog "-I-          CHECKING CELL=${cell}  ${MountPoint}/${project}/${user}/${area}/${cell} DIRECTORY"
-                            # verify that area is not symbolic link poiting to non-hertmp3 area
-                            if [ -L ${MountPoint}/${project}/${user}/${area}/${cell} ] ; then
-                                    wrLog "-W-      CELL=${cell} is a symbolic link, skipping"
-                                    continue
-                            fi
-                if [ -f ${MountPoint}/${project}/${user}/${area}/${cell} ] ; then
-                    wrLog "-W-          CELL=${cell} ${MountPoint}/${project}/${user}/${area}/${cell} is a file, skipping..."
-                    continue
-                fi
-				filesAmount=$(find ${MountPoint}/${project}/${user}/${area}/${cell} -type f -atime -${TTL} -print |wc -l)
-				#### We use 'f' type because direcotry access time changes every time we make find via it, due to this its not reliable to do it on directories.
-				#### Instead we check if there are files newer than $TTL days within directory, if not the whole directory will be removed.
-				if [ ${filesAmount} -eq 0 ];then
-					wrLog "-I-          NO FILES WHICH HAD ACCESS TIME NEWER THAN ${TTL} DAYS"
-					wrLog "-D-          DELETED ${MountPoint}/${project}/${user}/${area}/${cell}"
-					if [ -d "${MountPoint}/${project}/${user}/${area}/${cell}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" -a "X${cell}" != "X" ] ;then
-                                        /bin/rm -rf ${MountPoint}/${project}/${user}/${area}/${cell}
-
+			# Delete whole area if all objects inside have not been accessed for last 7 days
+			###            if [ $objectsAmount -eq 0 ] ; then
+			###                wrLog "-I-      No objects found which were accessed during last $TTL days in ${MountPoint}/${project}/${user}/${area}"
+			###                wrLog "-D-      Deleting AREA=${MountPoint}/${project}/${user}/${area}"
+			###					if [ -d "${MountPoint}/${project}/${user}/${area}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" ] ;then
+			###						    /bin/rm -rf ${MountPoint}/${project}/${user}/${area}
+			###                        # go to next iteration since current area has been removed
+			###                        continue
+			###					fi
+			###            fi
+			wrLog "-I- 		Will try to delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed for last $TTL days"
+			# Delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed  area if all objects inside have not been accessed for last 7 days
+			#for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime -${TTL} -print ) ; do
+			# -${TTL} - File was accessed TTL days ago
+			# ${TTL}  - Matches files accessed less than two days ago
+			###            for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime ${TTL} -print ) ; do
+			###                wrLog "-D-      Deleting file $fileToDel in AREA=${MountPoint}/${project}/${user}/${area}"
+			###			    /bin/rm -f ${fileToDel}
+			###            done
+			###            wrLog "-I-      DONE."
+			if [ -d ${MountPoint}/${project}/${user}/${area}/ ];then
+				for cell in $(ls ${MountPoint}/${project}/${user}/${area}/);do
+					wrLog "-I- 			CHECKING CELL=${cell}  ${MountPoint}/${project}/${user}/${area}/${cell} DIRECTORY"
+					# verify that area is not symbolic link poiting to non-hertmp3 area
+					if [ -d ${MountPoint}/${project}/${user}/${area}/${cell} ] ; then
+						filesAmount=$(ls ${MountPoint}/${project}/${user}/${area}/${cell} |wc -l)
+						if [ ${filesAmount} -eq 0 ];then
+							wrLog "-I- 			NO FILES UNDER ${MountPoint}/${project}/${user}/${area}/${cell}, DELETING DIRECTORY"
+							if [ "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" -a "X${cell}" != "X" ] ;then
+								if /bin/rmdir ${MountPoint}/${project}/${user}/${area}/${cell}; then
+									wrLog "-D- 			DELETED ${MountPoint}/${project}/${user}/${area}/${cell}"
+								else
+									wrLog "-E- 			FAILED TO DELETE ${MountPoint}/${project}/${user}/${area}/${cell}"
+									sendMail "${sender}" "-E- FAILED TO DELETE ${MountPoint}/${project}/${user}/${area}/${cell}"
+								fi
+							fi
+						else
+							continue
+						fi
 					fi
-				else
-					wrLog "-I-          RETAIN ${MountPoint}/${project}/${user}/${area}/${cell}, SINCE HAS ${filesAmount} FILES NEWER THAN ${TTL} days"
-				fi
-				wrLog "-I-           CELL=${cell} ${MountPoint}/${project}/${user}/${area}/${cell} CHECK FINISHED"
-			done
-				wrLog "-I-      AREA=${area} ${MountPoint}/${project}/${user}/${area} CHECK FINISHED"
+					wrLog "-I- 			CELL=${cell} ${MountPoint}/${project}/${user}/${area}/${cell} CHECK FINISHED"
+				done
+				wrLog "-I- 		AREA=${area} ${MountPoint}/${project}/${user}/${area} CHECK FINISHED"
+			fi
 		done
-        # Deleting old and empty user directories using find -mtime
-        #if [[ $(ls ${MountPoint}/${project}/${user}/ | wc -l) -eq 0 && $(find ${MountPoint}/${project}/${user} -type d -mtime -${TTL} -print |wc -l) -eq 0 ]]; then
-        #    wrLog "-D-  Deleting user directory ${MountPoint}/${project}/${user} which is empty and has not been modified for last $TTL days"
-        #    rmdir ${MountPoint}/${project}/${user}
-        #fi
-		wrLog "-I-  USER=${user} ${MountPoint}/${project}/${user} CHECK FINISHED"
+		# Deleting old and empty user directories using find -mtime
+		#if [[ $(ls ${MountPoint}/${project}/${user}/ | wc -l) -eq 0 && $(find ${MountPoint}/${project}/${user} -type d -mtime -${TTL} -print |wc -l) -eq 0 ]]; then
+		#    wrLog "-D-  Deleting user directory ${MountPoint}/${project}/${user} which is empty and has not been modified for last $TTL days"
+		#    rmdir ${MountPoint}/${project}/${user}
+		#fi
+
+		wrLog "-I- 	USER=${user} ${MountPoint}/${project}/${user} CHECK FINISHED"
 	done
 	wrLog "-I- PROJECT=${project} ${MountPoint}/${project} CHECK FINISHED"
 done
-wrLog "-I- HERTMP3 CLEANING PROCEDURE FINISHED"
+wrLog "-I- CLEANING PROCEDURE FINISHED"
 wrLog "-I- TRYING TO UNMOUNT ${MountPoint} "
 if ! /bin/umount ${MountPoint};then
 	wrLog "-E- FAILED TO UNMOUNT ${MountPoint}, terminatting"

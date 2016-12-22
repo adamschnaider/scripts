@@ -42,7 +42,7 @@ netapp_get_version() {
 		echo "Cluster-Mode"
 		return 1
 	elif [[ $version == "7-Mode" || -z $version ]]; then
-		echo 7Mode
+		echo "7Mode"
 		return 2
 	fi
 }
