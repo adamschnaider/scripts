@@ -97,8 +97,6 @@ CAT=/bin/cat
 ###############################################################################
 
 LOGSIZE=300
-#LOGFILEPATH=$(dirname $0)/hertmp3.cleaner.log
-#LOGFILEPATH=$(basename $0) && LOGFILEPATH=${LOGFILEPATH%%.*}.log
 USR_REVOKE_LIST=()
 TEMP_FILE=$($MKTEMP)
 #NFS_PATH="10g.mtlisilon:/ifs/MLNX_DATA/hertmp3";
@@ -206,16 +204,34 @@ wrLog "-I- CHECKING PROJECT=${project} on  ${MountPoint}/${project} DIRECTORY"
 		###            wrLog "-I-      DONE."
 		if [ ! -z $FTTL_objectsAmount ];then
 			wrLog "-I-		Sending USER:${user} first alert mail on files that haven't accessed between ${FIRST_ALERT_TTL}-${SECOND_ALERT_TTL} days ago"
-			msg_first_alert | mail -s "Automatic cleaning on $FILESYSTEM" ${user}@mellanox.com
+			msg_first_alert | mail -s "Automatic cleaning on $FILESYSTEM - INFO" ${user}@mellanox.com
+			if [ -d ${USERLOGFILEPATH}/${user} ];then
+				echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/INFO_$(date +%Y%m%d)
+			else
+				mkdir ${USERLOGFILEPATH}/${user}
+				echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/INFO_$(date +%Y%m%d)
+			fi
 		fi
 		if [ ! -z $STTL_objectsAmount ];then
 			wrLog "-I-		Sending USER:${user} second alert mail on files that haven't accessed between ${SECOND_ALERT_TTL}-${TTL} days ago"
-			msg_second_alert | mail -s "Automatic cleaning on $FILESYSTEM" ${user}@mellanox.com
+			msg_second_alert | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" ${user}@mellanox.com
+			if [ -d ${USERLOGFILEPATH}/${user} ];then
+                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/WARNING_$(date +%Y%m%d)
+                        else
+                                mkdir ${USERLOGFILEPATH}/${user}
+                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/WARNING_$(date +%Y%m%d)
+                        fi
 		fi
 		if [ ! -z $TTL_objectsAmount ];then
 			wrLog "-D-		Deleting files: $TTL_objectsAmount"
 			wrLog "-I-		Sending USER:${user} mail on files to delete which exceeded access time of $TTL days ago"
-			msg_delete_file | mail -s "Automatic cleaning on $FILESYSTEM" ${user}@mellanox.com
+			msg_delete_file | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" ${user}@mellanox.com
+			if [ -d ${USERLOGFILEPATH}/${user} ];then
+                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d)
+                        else
+                                mkdir ${USERLOGFILEPATH}/${user}
+                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d)
+                        fi
 				
 		fi
 		### if [ -d ${MountPoint}/${project}/${user}/${area}/ ];then

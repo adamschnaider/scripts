@@ -18,7 +18,7 @@
 + LOGSIZE=300
 + USR_REVOKE_LIST=()
 ++ /bin/mktemp
-+ TEMP_FILE=/tmp/tmp.FcJstJaTPP
++ TEMP_FILE=/tmp/tmp.BMjljP8oI9
 + NFS_PATH=mtlfs03.yok.mtl.com:/vol/adams_test
 + FIRST_ALERT_TTL=20
 + SECOND_ALERT_TTL=25
@@ -48,61 +48,48 @@
 + sender='AUTOMATIC CLEANER TESTING'
 + rotateLog
 + '[' '!' -d directory_cleaner.log ']'
-+ mkdir directory_cleaner.log
 + '[' '!' -f directory_cleaner.log/log ']'
-+ ln -s log.0 directory_cleaner.log/log
 + '[' '!' -f directory_cleaner.log/log.0 ']'
-+ touch directory_cleaner.log/log.0
 + '[' '!' -f directory_cleaner.log/log.1 ']'
-+ touch directory_cleaner.log/log.1
 + '[' '!' -f directory_cleaner.log/log.2 ']'
-+ touch directory_cleaner.log/log.2
 + '[' '!' -f directory_cleaner.log/log.3 ']'
-+ touch directory_cleaner.log/log.3
 + '[' '!' -f directory_cleaner.log/log.4 ']'
-+ touch directory_cleaner.log/log.4
 ++ du -sk directory_cleaner.log/log.0
 ++ awk '{print $1}'
-+ '[' 0 -gt 300 ']'
++ '[' 20 -gt 300 ']'
 + wrLog '-I- AUTOMATIC CLEANER TESTING START'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- AUTOMATIC CLEANER TESTING START'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- AUTOMATIC CLEANER TESTING START'
 + wrLog '-I- NFS PATH IS SET TO mtlfs03.yok.mtl.com:/vol/adams_test, MOUNTPOINT IS SET TO /usr/backend3'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- NFS PATH IS SET TO mtlfs03.yok.mtl.com:/vol/adams_test, MOUNTPOINT IS SET TO /usr/backend3'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- NFS PATH IS SET TO mtlfs03.yok.mtl.com:/vol/adams_test, MOUNTPOINT IS SET TO /usr/backend3'
 + wrLog '-I- TRYING TO CREATE MOUNTPOINT /usr/backend3'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- TRYING TO CREATE MOUNTPOINT /usr/backend3'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- TRYING TO CREATE MOUNTPOINT /usr/backend3'
 + /bin/mkdir /usr/backend3
 + wrLog '-I- MOUNTPOINT /usr/backend3 CREATED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- MOUNTPOINT /usr/backend3 CREATED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- MOUNTPOINT /usr/backend3 CREATED'
 + wrLog '-I- TRYING TO MOUNT NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3...'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- TRYING TO MOUNT NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3...'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- TRYING TO MOUNT NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3...'
 + /bin/mount mtlfs03.yok.mtl.com:/vol/adams_test /usr/backend3
 + wrLog '-I- MOUNTED NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3 CREATED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- MOUNTED NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3 CREATED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- MOUNTED NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3 CREATED'
 + '[' '!' -d directory_cleaner.log/USER ']'
-+ wrLog '-I- TRYING TO CREATE USER LOG DIRECTORY directory_cleaner.log/USER'
-+ '[' '!' -d directory_cleaner.log ']'
-++ date
-++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- TRYING TO CREATE USER LOG DIRECTORY directory_cleaner.log/USER'
-+ /bin/mkdir directory_cleaner.log/USER
 + splitByLines
 + IFS='
 '
@@ -112,14 +99,14 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- CHECKING PROJECT=project1 on  /usr/backend3/project1 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- CHECKING PROJECT=project1 on  /usr/backend3/project1 DIRECTORY'
 ++ ls /usr/backend3/project1/
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=adams on /usr/backend3/project1/adams DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=adams on /usr/backend3/project1/adams DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=adams on /usr/backend3/project1/adams DIRECTORY'
 ++ find /usr/backend3/project1/adams/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=/usr/backend3/project1/adams/dir2/file2
 ++ find /usr/backend3/project1/adams/ -type f -size +499M -atime +25 -atime -30 -print
@@ -130,58 +117,58 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project1/adams which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project1/adams which has not been accessed for last 30 days'
 + '[' '!' -z /usr/backend3/project1/adams/dir2/file2 ']'
 + wrLog '-I-		Sending USER:adams first alert mail on files that haven'\''t accessed between 20-25 days ago'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I-		Sending USER:adams first alert mail on files that haven'\''t accessed between 20-25 days ago'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I-		Sending USER:adams first alert mail on files that haven'\''t accessed between 20-25 days ago'
 + msg_first_alert
 + cat
-+ mail -s 'Automatic cleaning on backend3' adams@mellanox.com
++ mail -s 'Automatic cleaning on backend3 - INFO' adams@mellanox.com
 ++ echo /usr/backend3/project1/adams/dir2/file2
 + '[' '!' -z '/usr/backend3/project1/adams/dir3/file 3' ']'
 + wrLog '-I-		Sending USER:adams second alert mail on files that haven'\''t accessed between 25-30 days ago'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I-		Sending USER:adams second alert mail on files that haven'\''t accessed between 25-30 days ago'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I-		Sending USER:adams second alert mail on files that haven'\''t accessed between 25-30 days ago'
 + msg_second_alert
 + cat
 ++ echo '/usr/backend3/project1/adams/dir3/file 3'
-+ mail -s 'Automatic cleaning on backend3' adams@mellanox.com
++ mail -s 'Automatic cleaning on backend3 - WARNING' adams@mellanox.com
 + '[' '!' -z /usr/backend3/project1/adams/file4 ']'
 + wrLog '-D-		Deleting files: /usr/backend3/project1/adams/file4'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -D-		Deleting files: /usr/backend3/project1/adams/file4'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -D-		Deleting files: /usr/backend3/project1/adams/file4'
 + wrLog '-I-		Sending USER:adams mail on files to delete which exceeded access time of 30 days ago'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I-		Sending USER:adams mail on files to delete which exceeded access time of 30 days ago'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I-		Sending USER:adams mail on files to delete which exceeded access time of 30 days ago'
 + msg_delete_file
 + cat
++ mail -s 'Automatic cleaning on backend3 - DELETION' adams@mellanox.com
 ++ echo /usr/backend3/project1/adams/file4
-+ mail -s 'Automatic cleaning on backend3' adams@mellanox.com
 + wrLog '-I- 	USER=adams /usr/backend3/project1/adams CHECK FINISHED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=adams /usr/backend3/project1/adams CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=adams /usr/backend3/project1/adams CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user2 on /usr/backend3/project1/user2 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user2 on /usr/backend3/project1/user2 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user2 on /usr/backend3/project1/user2 DIRECTORY'
 ++ find /usr/backend3/project1/user2/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project1/user2/ -type f -size +499M -atime +25 -atime -30 -print
@@ -192,7 +179,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project1/user2 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project1/user2 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -200,18 +187,18 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user2 /usr/backend3/project1/user2 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user2 /usr/backend3/project1/user2 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user3 on /usr/backend3/project1/user3 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user3 on /usr/backend3/project1/user3 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user3 on /usr/backend3/project1/user3 DIRECTORY'
 ++ find /usr/backend3/project1/user3/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project1/user3/ -type f -size +499M -atime +25 -atime -30 -print
@@ -222,7 +209,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project1/user3 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project1/user3 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -230,35 +217,35 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user3 /usr/backend3/project1/user3 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user3 /usr/backend3/project1/user3 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + wrLog '-I- PROJECT=project1 /usr/backend3/project1 CHECK FINISHED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- PROJECT=project1 /usr/backend3/project1 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- PROJECT=project1 /usr/backend3/project1 CHECK FINISHED'
 + wrLog --------------------------------------------------------------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------------------------------------------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------------------------------------------------------------'
 + for project in '$(ls ${MountPoint}/)'
 + wrLog '-I- CHECKING PROJECT=project2 on  /usr/backend3/project2 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- CHECKING PROJECT=project2 on  /usr/backend3/project2 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- CHECKING PROJECT=project2 on  /usr/backend3/project2 DIRECTORY'
 ++ ls /usr/backend3/project2/
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user1 on /usr/backend3/project2/user1 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user1 on /usr/backend3/project2/user1 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user1 on /usr/backend3/project2/user1 DIRECTORY'
 ++ find /usr/backend3/project2/user1/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project2/user1/ -type f -size +499M -atime +25 -atime -30 -print
@@ -269,7 +256,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project2/user1 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project2/user1 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -277,18 +264,18 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user1 /usr/backend3/project2/user1 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user1 /usr/backend3/project2/user1 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user2 on /usr/backend3/project2/user2 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user2 on /usr/backend3/project2/user2 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user2 on /usr/backend3/project2/user2 DIRECTORY'
 ++ find /usr/backend3/project2/user2/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project2/user2/ -type f -size +499M -atime +25 -atime -30 -print
@@ -299,7 +286,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project2/user2 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project2/user2 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -307,18 +294,18 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user2 /usr/backend3/project2/user2 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user2 /usr/backend3/project2/user2 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user3 on /usr/backend3/project2/user3 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user3 on /usr/backend3/project2/user3 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user3 on /usr/backend3/project2/user3 DIRECTORY'
 ++ find /usr/backend3/project2/user3/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project2/user3/ -type f -size +499M -atime +25 -atime -30 -print
@@ -329,7 +316,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project2/user3 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project2/user3 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -337,35 +324,35 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user3 /usr/backend3/project2/user3 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user3 /usr/backend3/project2/user3 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + wrLog '-I- PROJECT=project2 /usr/backend3/project2 CHECK FINISHED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- PROJECT=project2 /usr/backend3/project2 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- PROJECT=project2 /usr/backend3/project2 CHECK FINISHED'
 + wrLog --------------------------------------------------------------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------------------------------------------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------------------------------------------------------------'
 + for project in '$(ls ${MountPoint}/)'
 + wrLog '-I- CHECKING PROJECT=project3 on  /usr/backend3/project3 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- CHECKING PROJECT=project3 on  /usr/backend3/project3 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- CHECKING PROJECT=project3 on  /usr/backend3/project3 DIRECTORY'
 ++ ls /usr/backend3/project3/
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user1 on /usr/backend3/project3/user1 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user1 on /usr/backend3/project3/user1 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user1 on /usr/backend3/project3/user1 DIRECTORY'
 ++ find /usr/backend3/project3/user1/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project3/user1/ -type f -size +499M -atime +25 -atime -30 -print
@@ -376,7 +363,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project3/user1 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project3/user1 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -384,18 +371,18 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user1 /usr/backend3/project3/user1 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user1 /usr/backend3/project3/user1 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user2 on /usr/backend3/project3/user2 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user2 on /usr/backend3/project3/user2 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user2 on /usr/backend3/project3/user2 DIRECTORY'
 ++ find /usr/backend3/project3/user2/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project3/user2/ -type f -size +499M -atime +25 -atime -30 -print
@@ -406,7 +393,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project3/user2 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project3/user2 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -414,18 +401,18 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user2 /usr/backend3/project3/user2 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user2 /usr/backend3/project3/user2 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + for user in '$(ls ${MountPoint}/${project}/)'
 + wrLog '-I- 	CHECKING USER=user3 on /usr/backend3/project3/user3 DIRECTORY'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	CHECKING USER=user3 on /usr/backend3/project3/user3 DIRECTORY'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	CHECKING USER=user3 on /usr/backend3/project3/user3 DIRECTORY'
 ++ find /usr/backend3/project3/user3/ -type f -size +499M -atime +20 -atime -25 -print
 + FTTL_objectsAmount=
 ++ find /usr/backend3/project3/user3/ -type f -size +499M -atime +25 -atime -30 -print
@@ -436,7 +423,7 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 		Will try to delete every file in /usr/backend3/project3/user3 which has not been accessed for last 30 days'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 		Will try to delete every file in /usr/backend3/project3/user3 which has not been accessed for last 30 days'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
 + '[' '!' -z ']'
@@ -444,58 +431,63 @@
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- 	USER=user3 /usr/backend3/project3/user3 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- 	USER=user3 /usr/backend3/project3/user3 CHECK FINISHED'
 + wrLog --------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------'
 + wrLog '-I- PROJECT=project3 /usr/backend3/project3 CHECK FINISHED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- PROJECT=project3 /usr/backend3/project3 CHECK FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- PROJECT=project3 /usr/backend3/project3 CHECK FINISHED'
 + wrLog --------------------------------------------------------------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: --------------------------------------------------------------------------------'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: --------------------------------------------------------------------------------'
 + wrLog '-I- CLEANING PROCEDURE FINISHED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- CLEANING PROCEDURE FINISHED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- CLEANING PROCEDURE FINISHED'
 + wrLog '-I- TRYING TO UNMOUNT /usr/backend3 '
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- TRYING TO UNMOUNT /usr/backend3 '
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- TRYING TO UNMOUNT /usr/backend3 '
 + /bin/umount /usr/backend3
 + wrLog '-I- /usr/backend3 UNMOUNTED'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- /usr/backend3 UNMOUNTED'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- /usr/backend3 UNMOUNTED'
 + wrLog '-I- TRYING TO REMOVE MOUNTPOINT /usr/backend3'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- TRYING TO REMOVE MOUNTPOINT /usr/backend3'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- TRYING TO REMOVE MOUNTPOINT /usr/backend3'
 + /bin/rmdir /usr/backend3
 + wrLog '-I- REMOVED MOUNTPOINT /usr/backend3'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- REMOVED MOUNTPOINT /usr/backend3'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- REMOVED MOUNTPOINT /usr/backend3'
 + wrLog '-I- AUTOMATIC CLEANER TESTING END'
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -I- AUTOMATIC CLEANER TESTING END'
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -I- AUTOMATIC CLEANER TESTING END'
 + wrLog -------------------------------------------------------------------------------------------------------------------------------------
 + '[' '!' -d directory_cleaner.log ']'
 ++ date
 ++ hostname
-+ echo 'Sun Dec 25 17:58:31 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[7842]: -------------------------------------------------------------------------------------------------------------------------------------'
-+ rm -f /tmp/tmp.FcJstJaTPP
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -------------------------------------------------------------------------------------------------------------------------------------'
++ wrLog -------------------------------------------------------------------------------------------------------------------------------------
++ '[' '!' -d directory_cleaner.log ']'
+++ date
+++ hostname
++ echo 'Sun Dec 25 18:04:20 IST 2016 mtlstadm01.mtl.com ./directory_cleaner.sh[8383]: -------------------------------------------------------------------------------------------------------------------------------------'
++ rm -f /tmp/tmp.BMjljP8oI9
 + exit 0
