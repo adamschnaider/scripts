@@ -1,14 +1,65 @@
 #!/bin/bash
-##################################################################################################
-## Backups rotation script
-##      Synosys: hertmp3_cleaner.sh
-##      Return:  exit code
-##      Example: hertmp3_cleaner.sh
+#################################################
+## 	Directory clean script:			#
+##      Synosys: directory_cleaner.sh		#
+##      Return:  exit code			#
+#################################################
+
 die(){
 rm -f $TEMP_FILE
 exit 1
 }
+
+msg_first_alert()
+{
+cat << EOF
+Hello,
+
+Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $FIRST_ALERT_TTL days:
+`echo "$FTTL_objectsAmount"`
+
+Files older than $TTL will be deleted.
+
+Regards,
+IT Department
+Note: Please do not reply to this email.
+EOF
+}
+
+msg_second_alert()
+{
+cat << EOF
+Hello,
+
+Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $SECOND_ALERT_TTL days:
+`echo "$STTL_objectsAmount"`
+
+Files older than $TTL will be deleted.
+
+Regards,
+IT Department
+Note: Please do not reply to this email.
+EOF
+}
+
+msg_delete()
+{
+cat << EOF
+Hello,
+
+Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $TTL days:
+`echo "$TTL_objectsAmount"`
+
+FILES WILL BE DELETED.
+
+Regards,
+IT Department
+Note: Please do not reply to this email.
+EOF
+}
+
 #################################################################
+
 STAT=/usr/bin/stat
 ID=/usr/bin/id
 GETENT=/usr/bin/getent
@@ -26,7 +77,9 @@ WC=/usr/bin/wc
 MKTEMP=/bin/mktemp
 DATE=/bin/date
 CAT=/bin/cat
-#################################################################
+
+###############################################################################
+
 LOGSIZE=300
 #LOGFILEPATH=$(dirname $0)/hertmp3.cleaner.log
 #LOGFILEPATH=$(basename $0) && LOGFILEPATH=${LOGFILEPATH%%.*}.log
@@ -42,8 +95,12 @@ LAST_ALERT_TTL=25
 ## Minimun file size to search (MB)
 MINSIZE="499M"
 #MountPoint="/mnt/hertmp3$$"
-MountPoint="/mnt/mtlfs03_adams_test_$$"
+#MountPoint="/mnt/mtlfs03_adams_test_$$"
+MountPoint="/mnt/backend3_cleaning_process"
+FILESYSTEM="backend3"
+
 ###############################################################################
+
 #functions_path="/mtlfs01/home/yokadm/Monitors/functions"
 functions_path="/home/yokadm/Monitors/functions"
 #contact_list_path="/mtlfs01/home/yokadm/Monitors/Contact_Groups"
@@ -67,7 +124,7 @@ USERLOGFILEPATH="${LOGFILEPATH}/USER"
 sender="AUTOMATIC CLEANER TESTING"
 
 rotateLog
-##########################################################################################################
+###############################################################################
 wrLog "-I- $sender START"
 wrLog "-I- NFS PATH IS SET TO ${NFS_PATH}, MOUNTPOINT IS SET TO ${MountPoint}"
 wrLog "-I- TRYING TO CREATE MOUNTPOINT ${MountPoint}"
@@ -113,23 +170,24 @@ wrLog "-I- CHECKING PROJECT=${project} on  ${MountPoint}/${project} DIRECTORY"
             		objectsAmount=0
 			filesAmount=0
 
-			objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime -${TTL} -print |wc -l)
-			FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime +${FIRST_ALERT_TTL} -type f -atime -${SECOND_ALERT_TTL} -print )
-			STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime +${SECOND_ALERT_TTL} -type f -atime -${LAST_ALERT_TTL} -print )
-			LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -size +${MINSIZE} -atime +${LAST_ALERT_TTL} -type f -atime -${TTL} -print )
-
-			# Delete whole area if all objects inside have not been accessed for last 7 days
-			###            if [ $objectsAmount -eq 0 ] ; then
-			###                wrLog "-I-      No objects found which were accessed during last $TTL days in ${MountPoint}/${project}/${user}/${area}"
-			###                wrLog "-D-      Deleting AREA=${MountPoint}/${project}/${user}/${area}"
-			###					if [ -d "${MountPoint}/${project}/${user}/${area}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" ] ;then
-			###						    /bin/rm -rf ${MountPoint}/${project}/${user}/${area}
-			###                        # go to next iteration since current area has been removed
-			###                        continue
-			###					fi
-			###            fi
+			objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -atime -${TTL} -print |wc -l)
+			FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${FIRST_ALERT_TTL} -atime -${SECOND_ALERT_TTL} -print )
+			STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${SECOND_ALERT_TTL} -atime -${LAST_ALERT_TTL} -print )
+			LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${LAST_ALERT_TTL} -atime -${TTL} -print )
+			TTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${TTL} -print )
+			# Delete whole area if all objects inside have not been accessed for last $TTL days
+			if [ $objectsAmount -eq 0 ] ; then
+				wrLog "-I- 		No objects found which were accessed during last $TTL days in ${MountPoint}/${project}/${user}/${area}"
+				wrLog "-D- 		Deleting AREA=${MountPoint}/${project}/${user}/${area}"
+				if [ -d "${MountPoint}/${project}/${user}/${area}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" ] ;then
+					### /bin/rm -rf ${MountPoint}/${project}/${user}/${area}
+					msg_delete | mail -s "Automatic cleaning on $FILESYSTEM" ${user}@mellanox.com
+					# go to next iteration since current area has been removed
+					continue
+				fi
+			fi
 			wrLog "-I- 		Will try to delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed for last $TTL days"
-			# Delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed  area if all objects inside have not been accessed for last 7 days
+			# Delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed area if all objects inside have not been accessed for last 7 days
 			#for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime -${TTL} -print ) ; do
 			# -${TTL} - File was accessed TTL days ago
 			# ${TTL}  - Matches files accessed less than two days ago
