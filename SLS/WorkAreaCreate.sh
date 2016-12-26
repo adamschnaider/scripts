@@ -22,6 +22,7 @@ cat <<EOF
     qa
     mtrsysgwork
     mtrswgwork
+    tgwork
 
 RDMZ:
     rdmzsysgwork
@@ -184,6 +185,10 @@ case "$workdir" in
                 ;;
 	rdmzsysgwork )
 		netapp_workdir rdmzlabfs01 /mnt/rdmzlabfs01_${workdir} $user mtl 777
+		;;
+	tgwork )
+		netapp_workdir ldmzlabfs01 /mnt/ldmzlabfs01_${workdir} $user sw_tools 775
+		chmod g+s /mnt/ldmzlabfs01_${workdir}
 		;;
 	help )
 		usage
