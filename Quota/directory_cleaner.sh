@@ -15,10 +15,10 @@ WARN_MSG()
 cat << EOF
 Hello,
 
-Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $WARN days:
+Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files/directories weren't accessed $WARN days:
 `printf '%s\n' "${WARN_AREA[@]}"`
 
-NOTICE: Files older than $TTL days will be deleted.
+NOTICE: FILES OLDER THAN $TTL DAYS WILL BE DELETED!
 
 Regards,
 IT Department
@@ -31,10 +31,10 @@ DEL_MSG()
 cat << EOF
 Hello,
 
-Automatic cleaning script under ${MountPoint}/${project}/${user} found the following areas older than $TTL days:
+Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files/directories weren't accessed $TTL days:
 `printf '%s\n' "${DEL_AREA[@]}"`
 
-FILES AND DIRECTORIES WILL BE DELETED.
+NOTICE: FILES AND DIRECTORIES WILL BE DELETED!
 
 Regards,
 IT Department
