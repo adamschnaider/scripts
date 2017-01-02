@@ -44,6 +44,8 @@ netapp_get_version() {
 	elif [[ $version == "7-Mode" || -z $version ]]; then
 		echo "7Mode"
 		return 2
+	else
+		echo "ERROR: Can't get filer version"
 	fi
 }
 

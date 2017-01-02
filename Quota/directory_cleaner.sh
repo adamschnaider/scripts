@@ -10,15 +10,15 @@ rm -f $TEMP_FILE
 exit 1
 }
 
-msg_first_alert()
+WARN_MSG()
 {
 cat << EOF
 Hello,
 
-Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $FIRST_ALERT_TTL days:
-`echo "$FTTL_objectsAmount"`
+Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $WARN days:
+`printf '%s\n' "${WARN_AREA[@]}"`
 
-Files older than $TTL will be deleted.
+NOTICE: Files older than $TTL days will be deleted.
 
 Regards,
 IT Department
@@ -26,47 +26,15 @@ Note: Please do not reply to this email.
 EOF
 }
 
-msg_second_alert()
+DEL_MSG()
 {
 cat << EOF
 Hello,
 
-Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $SECOND_ALERT_TTL days:
-`echo "$STTL_objectsAmount"`
+Automatic cleaning script under ${MountPoint}/${project}/${user} found the following areas older than $TTL days:
+`printf '%s\n' "${DEL_AREA[@]}"`
 
-Files older than $TTL will be deleted.
-
-Regards,
-IT Department
-Note: Please do not reply to this email.
-EOF
-}
-
-msg_delete_area()
-{
-cat << EOF
-Hello,
-
-Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $TTL days:
-`echo "$objectsUnderTTL"`
-
-FILES WILL BE DELETED.
-
-Regards,
-IT Department
-Note: Please do not reply to this email.
-EOF
-}
-
-msg_delete_file()
-{
-cat << EOF
-Hello,
-
-Automatic cleaning script under ${MountPoint}/${project}/${user} found the following files older than $TTL days:
-`echo "$TTL_objectsAmount"`
-
-FILES WILL BE DELETED IN $(( $DTTL - $TTL )) DAYS
+FILES AND DIRECTORIES WILL BE DELETED.
 
 Regards,
 IT Department
@@ -96,17 +64,16 @@ CAT=/bin/cat
 
 ###############################################################################
 
+USEMAIL="true"
 LOGSIZE=300
 USR_REVOKE_LIST=()
 TEMP_FILE=$($MKTEMP)
 #NFS_PATH="10g.mtlisilon:/ifs/MLNX_DATA/hertmp3";
 #NFS_PATH="mtlzfs01.yok.mtl.com:/export/BE/hertmp3";
 NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
-FIRST_ALERT_TTL=20
-SECOND_ALERT_TTL=25
+WARN=25
 TTL=30
 DTTL=35
-#LAST_ALERT_TTL=25
 ## Minimun file size to search (MB)
 MINSIZE="499M"
 #MountPoint="/mnt/hertmp3$$"
@@ -172,103 +139,67 @@ fi
 
 splitByLines
 for project in $(ls ${MountPoint}/);do
-wrLog "-I- CHECKING PROJECT=${project} on  ${MountPoint}/${project} DIRECTORY"
+	wrLog "-I- CHECKING PROJECT=${project} on  ${MountPoint}/${project} DIRECTORY"
 	for user in $(ls ${MountPoint}/${project}/);do
 		wrLog "-I- 	CHECKING USER=${user} on ${MountPoint}/${project}/${user} DIRECTORY"
-		#objectsUnderTTL=$(find ${MountPoint}/${project}/${user}/${area} -atime -${TTL} -print )
-		FTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${FIRST_ALERT_TTL} -atime -${SECOND_ALERT_TTL} -print )
-		### STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${SECOND_ALERT_TTL} -atime -${LAST_ALERT_TTL} -print )
-		STTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${SECOND_ALERT_TTL} -atime -${TTL} -print )
-		### LTTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${LAST_ALERT_TTL} -atime -${TTL} -print )
-		TTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -size +${MINSIZE} -atime +${TTL} -print )
-		### # Delete whole area if all objects inside have not been accessed for last $TTL days
-		### if [ -z "$objectsUnderTTL" ] ; then
-		### 	wrLog "-I- 		No objects found which were accessed during last $TTL days in ${MountPoint}/${project}/${user}/${area}"
-		###	wrLog "-D- 		Deleting AREA=${MountPoint}/${project}/${user}/${area}"
-		###	if [ -d "${MountPoint}/${project}/${user}/${area}" -a "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" ] ;then
-		###		### /bin/rm -rf ${MountPoint}/${project}/${user}/${area}
-		###		msg_delete_area | mail -s "Automatic cleaning on $FILESYSTEM" ${user}@mellanox.com
-		###		# go to next iteration since current area has been removed
-		###		continue
-		###	fi
-		### fi
-		wrLog "-I- 		Will try to delete every file in ${MountPoint}/${project}/${user} which has not been accessed for last $TTL days"
-		# Delete every file in ${MountPoint}/${project}/${user}/${area} which has not been accessed area if all objects inside have not been accessed for last 7 days
-		#for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime -${TTL} -print ) ; do
-		# -${TTL} - File was accessed TTL days ago
-		# ${TTL}  - Matches files accessed less than two days ago
-		###            for fileToDel in $(find ${MountPoint}/${project}/${user}/${area} -maxdepth 1 -type f -atime ${TTL} -print ) ; do
-		###                wrLog "-D-      Deleting file $fileToDel in AREA=${MountPoint}/${project}/${user}/${area}"
-		###			    /bin/rm -f ${fileToDel}
-		###            done
-		###            wrLog "-I-      DONE."
-		if [ ! -z $FTTL_objectsAmount ];then
-			wrLog "-I-		Sending USER:${user} first alert mail on files that haven't accessed between ${FIRST_ALERT_TTL}-${SECOND_ALERT_TTL} days ago"
-			msg_first_alert | mail -s "Automatic cleaning on $FILESYSTEM - INFO" ${user}@mellanox.com
-			if [ -d ${USERLOGFILEPATH}/${user} ];then
-				echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/INFO_$(date +%Y%m%d)
+		WARN_COUNT=0
+		DEL_COUNT=0
+		for area in $(ls ${MountPoint}/${project}/${user}/);do
+			wrLog "-I- 		CHECKING AREA=${area} on ${MountPoint}/${project}/${user}/${area}"
+			TTL_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -atime -${TTL} -print)
+			if [ ! -z "$TTL_objectsAmount" ]; then
+				WARN_objectsAmount=$(find ${MountPoint}/${project}/${user}/${area} -type f -atime -${WARN} -print)
+				if [ -z "$WARN_objectsAmount" ]; then
+					wrLog "-W- 			AREA ${area} WASN'T ACCESSED FOR ${WARN} DAYS"
+					WARN_AREA[$WARN_COUNT]=$area
+					let WARN_COUNT=$WARN_COUNT+1
+				fi
 			else
-				mkdir ${USERLOGFILEPATH}/${user}
-				echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/INFO_$(date +%Y%m%d)
+				wrLog "-D-			AREA ${area} WASN'T ACCESSED FOR ${TTL} DAYS AND WILL BE DELETED"
+				DEL_AREA[$DEL_COUNT]=$area
+				let DEL_COUNT=$DEL_COUNT+1
 			fi
+			wrLog "-I-		AREA=${area} ${MountPoint}/${project}/${user}/${area} CHECK FINISHED"
+			wrLog "-------------------"
+		done
+
+	## Logging & Mail
+	if [ ! -z "${WARN_AREA}" ];then
+		wrLog "-I-		Found files that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_$(date +%Y%m%d) for files list"
+		if [ "$USEMAIL" == "true" ];then
+			wrLog "-I-		Sending USER:${user} warning alert mail on files that haven't accessed $WARN days ago"
+			WARN_MSG | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" ${user}@mellanox.com
 		fi
-		if [ ! -z $STTL_objectsAmount ];then
-			wrLog "-I-		Sending USER:${user} second alert mail on files that haven't accessed between ${SECOND_ALERT_TTL}-${TTL} days ago"
-			msg_second_alert | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" ${user}@mellanox.com
-			if [ -d ${USERLOGFILEPATH}/${user} ];then
-                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/WARNING_$(date +%Y%m%d)
-                        else
-                                mkdir ${USERLOGFILEPATH}/${user}
-                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/WARNING_$(date +%Y%m%d)
-                        fi
+		if [ ! -d "${USERLOGFILEPATH}/${user}" ];then
+			mkdir ${USERLOGFILEPATH}/${user}
 		fi
-		if [ ! -z $TTL_objectsAmount ];then
-			wrLog "-D-		Deleting files: $TTL_objectsAmount"
+		printf '%s\n' "${WARN_AREA[@]}" >> ${USERLOGFILEPATH}/${user}/WARN_$(date +%Y%m%d)
+	fi
+	
+	if [ ! -z "${DEL_AREA}" ];then
+		wrLog "-I-		Found files that haven't accessed $TTL days ago, check: ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d) for files list"
+		if [ ! -z "$DTTL_objectsAmount" ];then
+			wrLog "-I-		Found directories that haven't accessed ${TTL} days ago"
+			wrLog "-D-		Deleting files older than ${TTL}: ${DEL_AREA[@]}"
+			### rm -f $TTL_objectsAmount
+		fi
+		if [ "$USEMAIL" == "true" ];then
 			wrLog "-I-		Sending USER:${user} mail on files to delete which exceeded access time of $TTL days ago"
-			msg_delete_file | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" ${user}@mellanox.com
-			if [ -d ${USERLOGFILEPATH}/${user} ];then
-                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d)
-                        else
-                                mkdir ${USERLOGFILEPATH}/${user}
-                                echo "$FTTL_objectsAmount" >> ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d)
-                        fi
-				
+			DEL_MSG | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" ${user}@mellanox.com
 		fi
-		### if [ -d ${MountPoint}/${project}/${user}/${area}/ ];then
-		###	for cell in $(ls ${MountPoint}/${project}/${user}/${area}/);do
-		###		wrLog "-I- 			CHECKING CELL=${cell}  ${MountPoint}/${project}/${user}/${area}/${cell} DIRECTORY"
-		###		# verify that area is not symbolic link poiting to non-hertmp3 area
-		###		if [ -d ${MountPoint}/${project}/${user}/${area}/${cell} ] ; then
-		###			filesAmount=$(ls ${MountPoint}/${project}/${user}/${area}/${cell} |wc -l)
-		###			if [ ${filesAmount} -eq 0 ];then
-		###				wrLog "-I- 			NO FILES UNDER ${MountPoint}/${project}/${user}/${area}/${cell}, DELETING DIRECTORY"
-		###				if [ "X${MountPoint}" != "X" -a "X${user}" != "X" -a "X${project}" != "X" -a "X${area}" != "X" -a "X${cell}" != "X" ] ;then
-		###					if /bin/rmdir ${MountPoint}/${project}/${user}/${area}/${cell}; then
-		###						wrLog "-D- 			DELETED ${MountPoint}/${project}/${user}/${area}/${cell}"
-		###					else
-		###						wrLog "-E- 			FAILED TO DELETE ${MountPoint}/${project}/${user}/${area}/${cell}"
-		###						sendMail "${sender}" "-E- FAILED TO DELETE ${MountPoint}/${project}/${user}/${area}/${cell}"
-		###					fi
-		###				fi
-		###			else
-		###				continue
-		###			fi
-		###		fi
-		###		wrLog "-I- 			CELL=${cell} ${MountPoint}/${project}/${user}/${area}/${cell} CHECK FINISHED"
-		###	done
-		###	wrLog "-I- 		AREA=${area} ${MountPoint}/${project}/${user}/${area} CHECK FINISHED"
-		### fi
-		# Deleting old and empty user directories using find -mtime
-		#if [[ $(ls ${MountPoint}/${project}/${user}/ | wc -l) -eq 0 && $(find ${MountPoint}/${project}/${user} -type d -mtime -${TTL} -print |wc -l) -eq 0 ]]; then
-		#    wrLog "-D-  Deleting user directory ${MountPoint}/${project}/${user} which is empty and has not been modified for last $TTL days"
-		#    rmdir ${MountPoint}/${project}/${user}
-		#fi
+		if [ ! -d ${USERLOGFILEPATH}/${user} ];then
+			mkdir ${USERLOGFILEPATH}/${user}
+		fi
+		printf '%s\n' "${DEL_AREA[@]}" >> ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d)
+	fi
 
 		wrLog "-I- 	USER=${user} ${MountPoint}/${project}/${user} CHECK FINISHED"
-		wrLog "--------------------------"
+		wrLog "---------------------------------------"
+		unset DEL_AREA
+		unset WARN_AREA
 	done
 	wrLog "-I- PROJECT=${project} ${MountPoint}/${project} CHECK FINISHED"
-	wrLog "--------------------------------------------------------------------------------"
+	wrLog "-------------------------------------------------------------------------------"
 done
 wrLog "-I- CLEANING PROCEDURE FINISHED"
 wrLog "-I- TRYING TO UNMOUNT ${MountPoint} "
