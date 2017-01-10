@@ -1,0 +1,60 @@
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- AUTOMATIC CLEANER TESTING START
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- NFS PATH IS SET TO mtlfs03.yok.mtl.com:/vol/adams_test, MOUNTPOINT IS SET TO /usr/backend3
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- TRYING TO CREATE MOUNTPOINT /usr/backend3
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- MOUNTPOINT /usr/backend3 CREATED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- TRYING TO MOUNT NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3...
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- MOUNTED NFS PATH mtlfs03.yok.mtl.com:/vol/adams_test TO /usr/backend3 CREATED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- TRYING TO CREATE USER LOG DIRECTORY directory_cleaner.log/USER
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- CHECKING PROJECT=project1 on  /usr/backend3/project1 DIRECTORY
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 	CHECKING USER=adams on /usr/backend3/project1/adams DIRECTORY
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=dir1 on /usr/backend3/project1/adams/dir1
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -D-			AREA dir1 WASN'T ACCESSED FOR 30 DAYS AND WILL BE DELETED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=dir1 /usr/backend3/project1/adams/dir1 CHECK FINISHED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=dir2 on /usr/backend3/project1/adams/dir2
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -D-			AREA dir2 WASN'T ACCESSED FOR 30 DAYS AND WILL BE DELETED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=dir2 /usr/backend3/project1/adams/dir2 CHECK FINISHED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=dir3 on /usr/backend3/project1/adams/dir3
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -D-			AREA dir3 WASN'T ACCESSED FOR 30 DAYS AND WILL BE DELETED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=dir3 /usr/backend3/project1/adams/dir3 CHECK FINISHED
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=file4 on /usr/backend3/project1/adams/file4
+Sun Jan  8 16:09:14 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -D-			AREA file4 WASN'T ACCESSED FOR 30 DAYS AND WILL BE DELETED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=file4 /usr/backend3/project1/adams/file4 CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=file5 on /usr/backend3/project1/adams/file5
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -D-			AREA file5 WASN'T ACCESSED FOR 30 DAYS AND WILL BE DELETED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=file5 /usr/backend3/project1/adams/file5 CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=file6 on /usr/backend3/project1/adams/file6
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=file6 /usr/backend3/project1/adams/file6 CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=test on /usr/backend3/project1/adams/test
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -D-			AREA test WASN'T ACCESSED FOR 30 DAYS AND WILL BE DELETED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=test /usr/backend3/project1/adams/test CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 		CHECKING AREA=test2 on /usr/backend3/project1/adams/test2
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -D-			AREA test2 WASN'T ACCESSED FOR 30 DAYS AND WILL BE DELETED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		AREA=test2 /usr/backend3/project1/adams/test2 CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		Found files that haven't accessed 30 days ago, check: directory_cleaner.log/USER/adams/DELETE_20170108 for files list
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I-		Sending USER:adams mail on files to delete which exceeded access time of 30 days ago
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 	USER=adams /usr/backend3/project1/adams CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: ---------------------------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 	CHECKING USER=user2 on /usr/backend3/project1/user2 DIRECTORY
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 	USER=user2 /usr/backend3/project1/user2 CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: ---------------------------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 	CHECKING USER=user3 on /usr/backend3/project1/user3 DIRECTORY
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- 	USER=user3 /usr/backend3/project1/user3 CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: ---------------------------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- PROJECT=project1 /usr/backend3/project1 CHECK FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------------------------------------------------------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- CLEANING PROCEDURE FINISHED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- TRYING TO UNMOUNT /usr/backend3 
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- /usr/backend3 UNMOUNTED
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- TRYING TO REMOVE MOUNTPOINT /usr/backend3
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- REMOVED MOUNTPOINT /usr/backend3
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -I- AUTOMATIC CLEANER TESTING END
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------------------------------------------------------------------------------------------------------------------------
+Sun Jan  8 16:09:15 IST 2017 mtlstadm01.mtl.com ./directory_cleaner.sh[8573]: -------------------------------------------------------------------------------------------------------------------------------------
