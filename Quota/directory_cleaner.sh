@@ -63,13 +63,13 @@ DATE=/bin/date
 CAT=/bin/cat
 
 ###############################################################################
+# Source config file
+
 
 USEMAIL="true"
 LOGSIZE=300
 USR_REVOKE_LIST=()
 TEMP_FILE=$($MKTEMP)
-#NFS_PATH="10g.mtlisilon:/ifs/MLNX_DATA/hertmp3";
-#NFS_PATH="mtlzfs01.yok.mtl.com:/export/BE/hertmp3";
 NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
 WARN=25
 TTL=30
@@ -91,25 +91,29 @@ contact_list_path="/home/yokadm/Monitors/Contact_Groups"
 #GROUP="IT_STORAGE"
 GROUP="IT_STORAGE_adams"
 
-# Sanity check
-host=$(hostname) && host=${host%%\.*}
-if [ $host != "sysmon" -a $host != "sysmon02" -a $host != "mtlstadm01" ];then
-	die
-fi
 # Source
 . ${functions_path}/bashIFS.bash
 . ${functions_path}/mail/sendMail.bash
 . ${functions_path}/Contact_Management/contact_management_functions.bash
+. ${functions_path}/LogHandler.bash
 
-. /root/scripts/functions/LogHandler.bash
 USERLOGFILEPATH="${LOGFILEPATH}/USER"
 sender="AUTOMATIC CLEANER TESTING"
 
 rotateLog
 ###############################################################################
 wrLog "-I- $sender START"
+
+# Sanity check
+host=$(hostname) && host=${host%%\.*}
+if [ $host != "sysmon" -a $host != "sysmon02" -a $host != "mtlstadm01" ];then
+	wrLog "-E- HOST IS NOT ALLOWED TO RUN $0"
+	die
+fi
+
 wrLog "-I- NFS PATH IS SET TO ${NFS_PATH}, MOUNTPOINT IS SET TO ${MountPoint}"
 wrLog "-I- TRYING TO CREATE MOUNTPOINT ${MountPoint}"
+
 # Create mount point
 if ! /bin/mkdir ${MountPoint};then
 	wrLog "-E- FAILED TO CREATE DIRECTORY ${MountPoint}, terminating..."
