@@ -15,7 +15,7 @@ WARN_MSG()
 cat << EOF
 Hello,
 
-Automatic cleaning script found under ${MountPoint}/${project}/${user} found the following files/directories that weren't accessed $WARN days:
+Automatic cleaning script found under ${FILESYSTEM}/${project}/${user} found the following files/directories that weren't accessed $WARN days:
 `printf '%s\n' "${WARN_AREA[@]}"`
 
 NOTICE: FILES OLDER THAN $TTL DAYS WILL BE DELETED!
@@ -31,7 +31,7 @@ DEL_MSG()
 cat << EOF
 Hello,
 
-Automatic cleaning script found under ${MountPoint}/${project}/${user} the following files/directories that weren't accessed $TTL days:
+Automatic cleaning script found under ${FILESYSTEM}/${project}/${user} the following files/directories that weren't accessed $TTL days:
 `printf '%s\n' "${DEL_AREA[@]}"`
 
 NOTICE: FILES AND DIRECTORIES WILL BE DELETED!
@@ -63,25 +63,6 @@ DATE=/bin/date
 CAT=/bin/cat
 
 ###############################################################################
-# Source config file
-
-
-USEMAIL="true"
-LOGSIZE=300
-USR_REVOKE_LIST=()
-TEMP_FILE=$($MKTEMP)
-NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
-WARN=25
-TTL=30
-DTTL=35
-## Minimun file size to search (MB)
-MINSIZE="499M"
-#MountPoint="/mnt/hertmp3$$"
-#MountPoint="/mnt/mtlfs03_adams_test_$$"
-MountPoint="/usr/backend3"
-FILESYSTEM="backend3"
-
-###############################################################################
 
 #functions_path="/mtlfs01/home/yokadm/Monitors/functions"
 functions_path="/home/yokadm/Monitors/functions"
@@ -102,6 +83,31 @@ sender="AUTOMATIC CLEANER TESTING"
 
 rotateLog
 ###############################################################################
+
+# Source config file
+if [[ -f $1 ]] && [[ -n $1 ]];then
+	wrLog "-I- SOURCING $1 CONFIG FILE"
+	source $1
+else
+	USEMAIL="false"
+	DELETE="false"
+	LOGSIZE=300
+	USR_REVOKE_LIST=()
+	TEMP_FILE=$($MKTEMP)
+	NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
+	WARN=120
+	TTL=180
+	#DTTL=
+	## Minimun file size to search (MB)
+	MINSIZE="499M"
+	#MountPoint="/mnt/hertmp3$$"
+	#MountPoint="/mnt/mtlfs03_adams_test_$$"
+	MountPoint="/usr/backend3"
+	FILESYSTEM="backend3"
+fi
+
+###############################################################################
+
 wrLog "-I- $sender START"
 
 # Sanity check
