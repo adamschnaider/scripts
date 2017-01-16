@@ -90,7 +90,7 @@ if [[ -f $1 ]] && [[ -n $1 ]];then
 	source $1
 else
 	USEMAIL="false"
-	DELETE="false"
+	DELETE="true"
 	LOGSIZE=300
 	USR_REVOKE_LIST=()
 	TEMP_FILE=$($MKTEMP)
@@ -101,8 +101,7 @@ else
 	## Minimun file size to search (MB)
 	MINSIZE="499M"
 	#MountPoint="/mnt/hertmp3$$"
-	#MountPoint="/mnt/mtlfs03_adams_test_$$"
-	MountPoint="/usr/backend3"
+	MountPoint="/mnt/mtlfs03_adams_test_$$"
 	FILESYSTEM="backend3"
 fi
 
@@ -170,14 +169,14 @@ for project in $(ls ${MountPoint}/);do
 				let DEL_COUNT=$DEL_COUNT+1
 			fi
 			wrLog "-I-		AREA=${area} ${MountPoint}/${project}/${user}/${area} CHECK FINISHED"
-			wrLog "-------------------"
+			wrLog "---------------------------------"
 		done
 
 	## Logging & Mail
 	if [ ! -z "${WARN_AREA}" ];then
-		wrLog "-I-		Found files that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_$(date +%Y%m%d) for files list"
+		wrLog "-I-		Found areas that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_$(date +%Y%m%d) for areas list"
 		if [ "$USEMAIL" == "true" ];then
-			wrLog "-I-		Sending USER:${user} warning alert mail on files that haven't accessed $WARN days ago"
+			wrLog "-I-		Sending USER:${user} warning alert mail on areas that haven't accessed $WARN days ago"
 			WARN_MSG | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" ${user}@mellanox.com
 		fi
 		if [ ! -d "${USERLOGFILEPATH}/${user}" ];then
@@ -187,14 +186,16 @@ for project in $(ls ${MountPoint}/);do
 	fi
 	
 	if [ ! -z "${DEL_AREA}" ];then
-		wrLog "-I-		Found files that haven't accessed $TTL days ago, check: ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d) for files list"
-		if [ ! -z "$DTTL_objectsAmount" ];then
-			wrLog "-I-		Found directories that haven't accessed ${TTL} days ago"
-			wrLog "-D-		Deleting files older than ${TTL}: ${DEL_AREA[@]}"
-			### rm -f $TTL_objectsAmount
+		wrLog "-I-		Found areas that haven't accessed $TTL days ago, check: ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d) for areas list"
+		if [ "${DELETE}X" == "trueX" ]; then
+			wrLog "-D-		Deleting areas older than ${TTL} days: ${DEL_AREA[*]}"
+			for object in ${DEL_AREA[@]};do
+				wrLog "rm -rf ${MountPoint}/${project}/${user}/${object}"
+				wrLog "-D-		Deleting area ${object} completed"
+			done
 		fi
 		if [ "$USEMAIL" == "true" ];then
-			wrLog "-I-		Sending USER:${user} mail on files to delete which exceeded access time of $TTL days ago"
+			wrLog "-I-		Sending USER:${user} mail on areas to delete which exceeded access time of $TTL days ago"
 			DEL_MSG | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" ${user}@mellanox.com
 		fi
 		if [ ! -d ${USERLOGFILEPATH}/${user} ];then
@@ -204,12 +205,12 @@ for project in $(ls ${MountPoint}/);do
 	fi
 
 		wrLog "-I- 	USER=${user} ${MountPoint}/${project}/${user} CHECK FINISHED"
-		wrLog "---------------------------------------"
+		wrLog "------------------------------------------------------------------"
 		unset DEL_AREA
 		unset WARN_AREA
 	done
 	wrLog "-I- PROJECT=${project} ${MountPoint}/${project} CHECK FINISHED"
-	wrLog "-------------------------------------------------------------------------------"
+	wrLog "-------------------------------------------------------------------------------------------------------------------------------------"
 done
 wrLog "-I- CLEANING PROCEDURE FINISHED"
 wrLog "-I- TRYING TO UNMOUNT ${MountPoint} "
