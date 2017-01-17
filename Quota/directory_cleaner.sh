@@ -82,6 +82,8 @@ USERLOGFILEPATH="${LOGFILEPATH}/USER"
 sender="AUTOMATIC CLEANER TESTING"
 
 rotateLog
+wrLog "-I- $sender START"
+
 ###############################################################################
 
 # Source config file
@@ -89,25 +91,27 @@ if [[ -f $1 ]] && [[ -n $1 ]];then
 	wrLog "-I- SOURCING $1 CONFIG FILE"
 	source $1
 else
+	wrLog "-W- CONFIG FILE WASN'T ENTERED, SETTING DEFAULT PARAMETERS"
 	USEMAIL="false"
-	DELETE="true"
+	DELETE="false"
 	LOGSIZE=300
 	USR_REVOKE_LIST=()
 	TEMP_FILE=$($MKTEMP)
 	NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
+	
+	# Data retention (days)
 	WARN=120
 	TTL=180
-	#DTTL=
+
 	## Minimun file size to search (MB)
 	MINSIZE="499M"
-	#MountPoint="/mnt/hertmp3$$"
+
 	MountPoint="/mnt/mtlfs03_adams_test_$$"
 	FILESYSTEM="backend3"
 fi
 
 ###############################################################################
 
-wrLog "-I- $sender START"
 
 # Sanity check
 host=$(hostname) && host=${host%%\.*}
