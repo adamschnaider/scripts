@@ -16,18 +16,19 @@ STTY=$(stty -g)
 
 usage () {
 cat <<EOF
-	Useage: $0 <Cdot filer> <volume> <vserver> <size in G> <aggr>
+	Useage: $0 <Cdot filer> <volume> <vserver> <size in G> <aggr> <ostype: vmware/windows_gpt>
 EOF
 exit 1
 }
 
-[[ $# -ne 5 ]] && echo "Invalid argument count" && usage
+[[ $# -ne 6 ]] && echo "Invalid argument count" && usage
 
 filer=$1
 volume=$2
 vserver=$3
 size=$4
 aggr=$5
+lun_type=$6
 max_autosize=$(echo "${size} * 1.25" | bc -l |awk -F'.' '{print $1}')
 netapp_version=$(ssh admin@${filer} version | grep NetApp |awk '{print $3}' | sed 's/\..*//g')
 [[ $size -gt 20 ]] && autoIncr="20G" || autoIncr="1G"
@@ -43,7 +44,7 @@ ssh admin@${filer} vol modify -vserver $vserver -volume $volume -fractional-rese
 
 
 echo -e "Creating LUN:"
-ssh admin@${filer} lun create -vserver $vserver -path /vol/${volume}/${volume}.lun -size ${size}g -ostype vmware -space-reserve disabled
+ssh admin@${filer} lun create -vserver $vserver -path /vol/${volume}/${volume}.lun -size ${size}g -ostype $lun_type -space-reserve disabled
 ssh admin@${filer} snapshot autodelete modify -vserver $vserver -volume $volume -enabled true -commitment destroy -target-free-space 10% -destroy-list lun_clone
 
 if [ $netapp_version -lt 9 ]; then
