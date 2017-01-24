@@ -99,6 +99,8 @@ else
 	TEMP_FILE=$($MKTEMP)
 	NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
 	TIMESTAMP=$(date +%Y%m%d_%H:%M)
+	SENDER="IT_DEPT"
+	SENDER_MAIL="<it_dept@mellanox.com>"
 	
 	# Data retention (days)
 	WARN=120
@@ -184,7 +186,7 @@ for project in $(ls ${MountPoint}/);do
 		wrLog "-I-		Found areas that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_${TIMESTAMP} for areas list"
 		if [ "$USEMAIL" == "true" ];then
 			wrLog "-I-		Sending USER:${user} warning alert mail on areas that haven't accessed $WARN days ago"
-			WARN_MSG | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" ${user}@mellanox.com
+			WARN_MSG | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" -r "${SENDER} ${SENDER_MAIL}" ${user}@mellanox.com
 		fi
 		if [ ! -d "${USERLOGFILEPATH}/${user}" ];then
 			mkdir ${USERLOGFILEPATH}/${user}
@@ -203,7 +205,7 @@ for project in $(ls ${MountPoint}/);do
 		fi
 		if [ "$USEMAIL" == "true" ];then
 			wrLog "-I-		Sending USER:${user} mail on areas to delete which exceeded access time of $TTL days ago"
-			DEL_MSG | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" ${user}@mellanox.com
+			DEL_MSG | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" -r "${SENDER} ${SENDER_MAIL}" ${user}@mellanox.com
 		fi
 		if [ ! -d ${USERLOGFILEPATH}/${user} ];then
 			mkdir ${USERLOGFILEPATH}/${user}
