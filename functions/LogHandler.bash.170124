@@ -7,7 +7,7 @@
 ###################################################
 
 LOGSIZE=300
-LOGFILEPATH=$(basename $0) && LOGFILEPATH=$(dirname $0)/${LOGFILEPATH%.*}.log
+LOGFILEPATH=$(basename $0) && LOGFILEPATH=${LOGFILEPATH%%.*}.log
 
 wrLog() {
 [ ! -d ${LOGFILEPATH} ] && mkdir ${LOGFILEPATH}
