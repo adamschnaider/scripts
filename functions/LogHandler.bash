@@ -7,15 +7,28 @@
 ###################################################
 
 LOGSIZE=300
-LOGFILEPATH=$(basename $0) && LOGFILEPATH=$(dirname $0)/${LOGFILEPATH%.*}.log
+
+## Create log directory on script directory
+#LOGFILEPATH=$(basename $0) && LOGFILEPATH=$(dirname $0)/${LOGFILEPATH%.*}.log
+
+## Create log directory on user path
+LOGFILEPATH=$(basename $0) && LOGFILEPATH=${LOGFILEPATH%%.*}.log
 
 wrLog() {
 [ ! -d ${LOGFILEPATH} ] && mkdir ${LOGFILEPATH}
+if [ ! -d ${LOGFILEPATH} ];then
+	echo "-E- CANNOT CREATE LOG DIRECTORY"
+	exit
+fi
 echo "$(date) $(hostname) $0[$$]: $1" >> ${LOGFILEPATH}/log.0
 }
 
 rotateLog(){
 [ ! -d ${LOGFILEPATH} ] && mkdir ${LOGFILEPATH}
+if [ ! -d ${LOGFILEPATH} ];then
+        echo "-E- CANNOT CREATE LOG DIRECTORY"
+        exit
+fi
 [ ! -f ${LOGFILEPATH}/log ] && ln -s log.0 ${LOGFILEPATH}/log
 [ ! -f ${LOGFILEPATH}/log.0 ] && touch ${LOGFILEPATH}/log.0
 [ ! -f ${LOGFILEPATH}/log.1 ] && touch ${LOGFILEPATH}/log.1

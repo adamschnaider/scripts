@@ -6,7 +6,8 @@
 #################################################
 
 die(){
-rm -f $TEMP_FILE
+[ -e $TEMP_FILE ] && rm -f $TEMP_FILE
+[ -e ${functions_path}/LogHandler.bash ] && wrLog "-------------------------------------------------------------------------------------------------------------------------------------"
 exit 1
 }
 
@@ -73,10 +74,10 @@ contact_list_path="/home/yokadm/Monitors/Contact_Groups"
 GROUP="IT_STORAGE_adams"
 
 # Source
-. ${functions_path}/bashIFS.bash
-. ${functions_path}/mail/sendMail.bash
-. ${functions_path}/Contact_Management/contact_management_functions.bash
-. ${functions_path}/LogHandler.bash
+. ${functions_path}/bashIFS.bash || die
+. ${functions_path}/mail/sendMail.bash || die
+. ${functions_path}/Contact_Management/contact_management_functions.bash || die
+. ${functions_path}/LogHandler.bash || die
 
 USERLOGFILEPATH="${LOGFILEPATH}/USER"
 sender="AUTOMATIC CLEANER TESTING"
@@ -113,14 +114,14 @@ else
 	FILESYSTEM="backend3"
 fi
 
-wrLog "-I- VARIABLES: USEMAIL=${USEMAIL}; DELETE=${DELETE}; LOGSIZE=${LOGSIZE} USR_REVOKE_LIST=${USR_REVOKE_LIST[*]}; TEMP_FILE=${NFS_PATH}; NFS_PATH=${NFS_PATH}; TIMESTAMP=${TIMESTAMP}; WARN=${WARN}; TTL=${TTL}; MINSIZE=${MINSIZE}; MountPoint=${MountPoint}; FILESYSTEM=${FILESYSTEM}"
+wrLog "-I- VARIABLES: USEMAIL=${USEMAIL}; DELETE=${DELETE}; LOGSIZE=${LOGSIZE} USR_REVOKE_LIST=${USR_REVOKE_LIST[*]}; TEMP_FILE=${NFS_PATH}; NFS_PATH=${NFS_PATH}; TIMESTAMP=${TIMESTAMP}; SENDER=${SENDER}; SENDER_MAIL=${SENDER_MAIL}; WARN=${WARN}; TTL=${TTL}; MINSIZE=${MINSIZE}; MountPoint=${MountPoint}; FILESYSTEM=${FILESYSTEM}"
 
 ###############################################################################
 
 
 # Sanity check
 host=$(hostname) && host=${host%%\.*}
-if [ $host != "sysmon" -a $host != "sysmon02" -a $host != "mtlstadm01" ];then
+if [ $host != "sysmon" -a $host != "sysmon02" -a $host != "mtlstadm01" -a $host != "mtlxsge001" ];then
 	wrLog "-E- HOST IS NOT ALLOWED TO RUN $0"
 	die
 fi
@@ -132,7 +133,7 @@ wrLog "-I- TRYING TO CREATE MOUNTPOINT ${MountPoint}"
 if ! /bin/mkdir ${MountPoint};then
 	wrLog "-E- FAILED TO CREATE DIRECTORY ${MountPoint}, terminating..."
 	sendMail "${sender}" "-E- FAILED TO CREATE DIRECTORY ${MountPoint}" $(getMails $GROUP)
-    die
+    	die
 fi
 
 # Try to mount the mountpoint
@@ -141,7 +142,7 @@ wrLog "-I- TRYING TO MOUNT NFS PATH ${NFS_PATH} TO ${MountPoint}..."
 if ! /bin/mount ${NFS_PATH} ${MountPoint};then
 	wrLog "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}, terminatting"
 	sendMail "${sender}" "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}" $(getMails $GROUP)
-    die
+    	die
 fi
 wrLog "-I- MOUNTED NFS PATH ${NFS_PATH} TO ${MountPoint} CREATED"
 
@@ -226,7 +227,7 @@ wrLog "-I- TRYING TO UNMOUNT ${MountPoint} "
 if ! /bin/umount ${MountPoint};then
 	wrLog "-E- FAILED TO UNMOUNT ${MountPoint}, terminatting"
 	sendMail "${sender}" "-E- FAILED TO UNMOUNT ${MountPoint}" $(getMails $GROUP)
-    die
+    	die
 fi
 
 wrLog "-I- ${MountPoint} UNMOUNTED"
@@ -234,7 +235,7 @@ wrLog "-I- TRYING TO REMOVE MOUNTPOINT ${MountPoint}"
 if ! /bin/rmdir ${MountPoint};then
 	wrLog "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}, terminatting"
 	sendMail "${sender}" "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}" $(getMails $GROUP)
-    die
+    	die
 fi
 wrLog "-I- REMOVED MOUNTPOINT ${MountPoint}"
 
