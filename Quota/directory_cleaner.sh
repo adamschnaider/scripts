@@ -88,7 +88,7 @@ wrLog "-I- $sender START"
 
 # Source config file
 if [[ -f $1 ]] && [[ -n $1 ]];then
-	wrLog "-I- SOURCING $1 CONFIG FILE"
+	wrLog "-I- SOURCING CONFIG FILE: $1"
 	source $1
 else
 	wrLog "-W- CONFIG FILE WASN'T ENTERED, SETTING DEFAULT PARAMETERS"
@@ -98,6 +98,7 @@ else
 	USR_REVOKE_LIST=()
 	TEMP_FILE=$($MKTEMP)
 	NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
+	TIMESTAMP=$(date +%Y%m%d_%H:%M)
 	
 	# Data retention (days)
 	WARN=120
@@ -109,6 +110,8 @@ else
 	MountPoint="/mnt/mtlfs03_adams_test_$$"
 	FILESYSTEM="backend3"
 fi
+
+wrLog "-I- VARIABLES: USEMAIL=${USEMAIL}; DELETE=${DELETE}; LOGSIZE=${LOGSIZE} USR_REVOKE_LIST=${USR_REVOKE_LIST[*]}; TEMP_FILE=${NFS_PATH}; NFS_PATH=${NFS_PATH}; TIMESTAMP=${TIMESTAMP}; WARN=${WARN}; TTL=${TTL}; MINSIZE=${MINSIZE}; MountPoint=${MountPoint}; FILESYSTEM=${FILESYSTEM}"
 
 ###############################################################################
 
@@ -178,7 +181,7 @@ for project in $(ls ${MountPoint}/);do
 
 	## Logging & Mail
 	if [ ! -z "${WARN_AREA}" ];then
-		wrLog "-I-		Found areas that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_$(date +%Y%m%d) for areas list"
+		wrLog "-I-		Found areas that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_${TIMESTAMP} for areas list"
 		if [ "$USEMAIL" == "true" ];then
 			wrLog "-I-		Sending USER:${user} warning alert mail on areas that haven't accessed $WARN days ago"
 			WARN_MSG | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" ${user}@mellanox.com
@@ -186,11 +189,11 @@ for project in $(ls ${MountPoint}/);do
 		if [ ! -d "${USERLOGFILEPATH}/${user}" ];then
 			mkdir ${USERLOGFILEPATH}/${user}
 		fi
-		printf '%s\n' "${WARN_AREA[@]}" >> ${USERLOGFILEPATH}/${user}/WARN_$(date +%Y%m%d)
+		printf '%s\n' "${WARN_AREA[@]}" >> ${USERLOGFILEPATH}/${user}/WARN_${TIMESTAMP}
 	fi
 	
 	if [ ! -z "${DEL_AREA}" ];then
-		wrLog "-I-		Found areas that haven't accessed $TTL days ago, check: ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d) for areas list"
+		wrLog "-I-		Found areas that haven't accessed $TTL days ago, check: ${USERLOGFILEPATH}/${user}/DELETE_${TIMESTAMP} for areas list"
 		if [ "${DELETE}X" == "trueX" ]; then
 			wrLog "-D-		Deleting areas older than ${TTL} days: ${DEL_AREA[*]}"
 			for object in ${DEL_AREA[@]};do
@@ -205,7 +208,7 @@ for project in $(ls ${MountPoint}/);do
 		if [ ! -d ${USERLOGFILEPATH}/${user} ];then
 			mkdir ${USERLOGFILEPATH}/${user}
 		fi
-		printf '%s\n' "${DEL_AREA[@]}" >> ${USERLOGFILEPATH}/${user}/DELETE_$(date +%Y%m%d)
+		printf '%s\n' "${DEL_AREA[@]}" >> ${USERLOGFILEPATH}/${user}/DELETE_${TIMESTAMP}
 	fi
 
 		wrLog "-I- 	USER=${user} ${MountPoint}/${project}/${user} CHECK FINISHED"
