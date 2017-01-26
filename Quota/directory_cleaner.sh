@@ -1,13 +1,16 @@
 #!/bin/bash
 #################################################
-## 	Directory clean script:			#
-##      Synosys: directory_cleaner.sh		#
+## 	Work-Area cleaning script:		#
+##      Synosys: workarea_cleaner.sh		#
 ##      Return:  exit code			#
 #################################################
 
 die(){
 [ -e $TEMP_FILE ] && rm -f $TEMP_FILE
-[ -e ${functions_path}/LogHandler.bash ] && wrLog "-------------------------------------------------------------------------------------------------------------------------------------"
+[ ! -e ${functions_path}/LogHandler.bash ] && exit 1
+sendMail "${sender}" "-E- ERROR INITIALIZING SCRIPT, CHECK: ${LOGFILEPATH}" $(getMails $MAIL_GROUP)
+wrLog "-------------------------------------------------------------------------------------------------------------------------------------"
+wrLog "-------------------------------------------------------------------------------------------------------------------------------------"
 exit 1
 }
 
@@ -43,7 +46,20 @@ Note: Please do not reply to this email.
 EOF
 }
 
-#################################################################
+lock()
+{
+if [ -e ${LOCKFILE} ]; then
+	wrLog "-E- LOCK FILE WAS FOUND: ${LOCKFILE}, ENDING"
+	die
+else
+	if ! touch ${LOCKFILE} ;then
+		wrLog "-E- CAN'T CREATE LOCK FILE: ${LOCKFILE}"
+		die
+	fi
+fi
+}
+
+###############################################################################
 
 STAT=/usr/bin/stat
 ID=/usr/bin/id
@@ -70,8 +86,8 @@ functions_path="/home/yokadm/Monitors/functions"
 #contact_list_path="/mtlfs01/home/yokadm/Monitors/Contact_Groups"
 contact_list_path="/home/yokadm/Monitors/Contact_Groups"
 
-#GROUP="IT_STORAGE"
-GROUP="IT_STORAGE_adams"
+#MAIL_GROUP="IT_STORAGE"
+MAIL_GROUP="IT_STORAGE_adams"
 
 # Source
 . ${functions_path}/bashIFS.bash || die
@@ -82,10 +98,17 @@ GROUP="IT_STORAGE_adams"
 USERLOGFILEPATH="${LOGFILEPATH}/USER"
 sender="AUTOMATIC CLEANER TESTING"
 
+LOCKFILE="/tmp/workarea_cleaner.lock"
+
+SENDER="IT_DEPT"
+SENDER_MAIL="<it_dept@mellanox.com>"
+
 rotateLog
-wrLog "-I- $sender START"
+lock
 
 ###############################################################################
+
+wrLog "-I- $sender START"
 
 # Source config file
 if [[ -f $1 ]] && [[ -n $1 ]];then
@@ -96,12 +119,11 @@ else
 	USEMAIL="false"
 	DELETE="false"
 	LOGSIZE=300
-	USR_REVOKE_LIST=()
+	USER_REVOKE_LIST=""
+	PROJECT_REVOKE_LIST=""
 	TEMP_FILE=$($MKTEMP)
 	NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
 	TIMESTAMP=$(date +%Y%m%d_%H:%M)
-	SENDER="IT_DEPT"
-	SENDER_MAIL="<it_dept@mellanox.com>"
 	
 	# Data retention (days)
 	WARN=120
@@ -114,10 +136,12 @@ else
 	FILESYSTEM="backend3"
 fi
 
-wrLog "-I- VARIABLES: USEMAIL=${USEMAIL}; DELETE=${DELETE}; LOGSIZE=${LOGSIZE} USR_REVOKE_LIST=${USR_REVOKE_LIST[*]}; TEMP_FILE=${NFS_PATH}; NFS_PATH=${NFS_PATH}; TIMESTAMP=${TIMESTAMP}; SENDER=${SENDER}; SENDER_MAIL=${SENDER_MAIL}; WARN=${WARN}; TTL=${TTL}; MINSIZE=${MINSIZE}; MountPoint=${MountPoint}; FILESYSTEM=${FILESYSTEM}"
+[ -z ${USER_REVOKE_LIST} ] && USER_REVOKE_LIST="NONE"
+[ -z ${PROJECT_REVOKE_LIST} ] && PROJECT_REVOKE_LIST="NONE"
+
+wrLog "-I- VARIABLES: USEMAIL=${USEMAIL}; DELETE=${DELETE}; LOGSIZE=${LOGSIZE} USER_REVOKE_LIST=${USER_REVOKE_LIST[*]}; PROJECT_REVOKE_LIST=${PROJECT_REVOKE_LIST[*]}; TEMP_FILE=${NFS_PATH}; NFS_PATH=${NFS_PATH}; TIMESTAMP=${TIMESTAMP}; SENDER=${SENDER}; SENDER_MAIL=${SENDER_MAIL}; WARN=${WARN}; TTL=${TTL}; MINSIZE=${MINSIZE}; MountPoint=${MountPoint}; FILESYSTEM=${FILESYSTEM}"
 
 ###############################################################################
-
 
 # Sanity check
 host=$(hostname) && host=${host%%\.*}
@@ -132,7 +156,7 @@ wrLog "-I- TRYING TO CREATE MOUNTPOINT ${MountPoint}"
 # Create mount point
 if ! /bin/mkdir ${MountPoint};then
 	wrLog "-E- FAILED TO CREATE DIRECTORY ${MountPoint}, terminating..."
-	sendMail "${sender}" "-E- FAILED TO CREATE DIRECTORY ${MountPoint}" $(getMails $GROUP)
+	sendMail "${sender}" "-E- FAILED TO CREATE DIRECTORY ${MountPoint}" $(getMails $MAIL_GROUP)
     	die
 fi
 
@@ -141,7 +165,7 @@ wrLog "-I- MOUNTPOINT ${MountPoint} CREATED"
 wrLog "-I- TRYING TO MOUNT NFS PATH ${NFS_PATH} TO ${MountPoint}..." 
 if ! /bin/mount ${NFS_PATH} ${MountPoint};then
 	wrLog "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}, terminatting"
-	sendMail "${sender}" "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}" $(getMails $GROUP)
+	sendMail "${sender}" "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}" $(getMails $MAIL_GROUP)
     	die
 fi
 wrLog "-I- MOUNTED NFS PATH ${NFS_PATH} TO ${MountPoint} CREATED"
@@ -151,15 +175,15 @@ if [ ! -d ${USERLOGFILEPATH} ];then
 	wrLog "-I- TRYING TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
 	if ! /bin/mkdir ${USERLOGFILEPATH}; then
 		wrLog "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
-		sendMail "${sender}" "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}"
+		sendMail "${sender}" "-E- FAILED TO CREATE USER LOG DIRECTORY ${USERLOGFILEPATH}" $(getMails $MAIL_GROUP)
 		die
 	fi
 fi
 
 splitByLines
-for project in $(ls ${MountPoint}/);do
+for project in $(ls ${MountPoint}/ | grep -Ev ${PROJECT_REVOKE_LIST});do
 	wrLog "-I- CHECKING PROJECT=${project} on  ${MountPoint}/${project} DIRECTORY"
-	for user in $(ls ${MountPoint}/${project}/);do
+	for user in $(ls ${MountPoint}/${project}/ | grep -Ev ${USER_REVOKE_LIST});do
 		wrLog "-I- 	CHECKING USER=${user} on ${MountPoint}/${project}/${user} DIRECTORY"
 		WARN_COUNT=0
 		DEL_COUNT=0
@@ -185,7 +209,7 @@ for project in $(ls ${MountPoint}/);do
 	## Logging & Mail
 	if [ ! -z "${WARN_AREA}" ];then
 		wrLog "-I-		Found areas that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_${TIMESTAMP} for areas list"
-		if [ "$USEMAIL" == "true" ];then
+		if [ "${USEMAIL}X" == "trueX" ];then
 			wrLog "-I-		Sending USER:${user} warning alert mail on areas that haven't accessed $WARN days ago"
 			WARN_MSG | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" -r "${SENDER} ${SENDER_MAIL}" ${user}@mellanox.com
 		fi
@@ -204,7 +228,7 @@ for project in $(ls ${MountPoint}/);do
 				wrLog "-D-		Deleting area ${object} completed"
 			done
 		fi
-		if [ "$USEMAIL" == "true" ];then
+		if [ "${USEMAIL}X" == "trueX" ];then
 			wrLog "-I-		Sending USER:${user} mail on areas to delete which exceeded access time of $TTL days ago"
 			DEL_MSG | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" -r "${SENDER} ${SENDER_MAIL}" ${user}@mellanox.com
 		fi
@@ -226,7 +250,7 @@ wrLog "-I- CLEANING PROCEDURE FINISHED"
 wrLog "-I- TRYING TO UNMOUNT ${MountPoint} "
 if ! /bin/umount ${MountPoint};then
 	wrLog "-E- FAILED TO UNMOUNT ${MountPoint}, terminatting"
-	sendMail "${sender}" "-E- FAILED TO UNMOUNT ${MountPoint}" $(getMails $GROUP)
+	sendMail "${sender}" "-E- FAILED TO UNMOUNT ${MountPoint}" $(getMails $MAIL_GROUP)
     	die
 fi
 
@@ -234,7 +258,7 @@ wrLog "-I- ${MountPoint} UNMOUNTED"
 wrLog "-I- TRYING TO REMOVE MOUNTPOINT ${MountPoint}"
 if ! /bin/rmdir ${MountPoint};then
 	wrLog "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}, terminatting"
-	sendMail "${sender}" "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}" $(getMails $GROUP)
+	sendMail "${sender}" "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}" $(getMails $MAIL_GROUP)
     	die
 fi
 wrLog "-I- REMOVED MOUNTPOINT ${MountPoint}"
@@ -243,4 +267,5 @@ wrLog "-I- $sender END"
 wrLog "-------------------------------------------------------------------------------------------------------------------------------------"
 wrLog "-------------------------------------------------------------------------------------------------------------------------------------"
 rm -f $TEMP_FILE
+rm -f ${LOCKFILE}
 exit 0
