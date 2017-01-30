@@ -20,7 +20,7 @@ cat << EOF
 Hello,
 
 Automatic cleaning script found under ${FILESYSTEM}/${project}/${user} found the following files/directories that weren't accessed $WARN days:
-`cat ${USERLOGFILEPATH}/${user}/WARN_${TIMESTAMP}`
+`printf '%s\n' "${WARN_AREA[@]}"`
 
 NOTICE: FILES OLDER THAN $TTL DAYS WILL BE DELETED!
 
@@ -36,7 +36,7 @@ cat << EOF
 Hello,
 
 Automatic cleaning script found under ${FILESYSTEM}/${project}/${user} the following files/directories that weren't accessed $TTL days:
-`cat ${USERLOGFILEPATH}/${user}/DELETE_${TIMESTAMP}`
+`printf '%s\n' "${DEL_AREA[@]}"`
 
 NOTICE: FILES AND DIRECTORIES WILL BE DELETED!
 
