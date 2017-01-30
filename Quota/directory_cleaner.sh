@@ -116,7 +116,7 @@ if [[ -f $1 ]] && [[ -n $1 ]];then
 	source $1
 else
 	wrLog "-W- CONFIG FILE WASN'T ENTERED or NOT EXISTS, SETTING DEFAULT PARAMETERS"
-	USEMAIL="true"
+	USEMAIL="false"
 	DELETE="false"
 	LOGSIZE=300
 	USER_REVOKE_LIST=""
@@ -210,10 +210,6 @@ for project in $(ls ${MountPoint}/ | grep -Ev ${PROJECT_REVOKE_LIST});do
 	## Logging & Mail
 	if [ ! -z "${WARN_AREA}" ];then
 		wrLog "-I-		Found areas that haven't accessed $WARN days ago, check: ${USERLOGFILEPATH}/${user}/WARN_${TIMESTAMP} for areas list"
-#		if [ "${USEMAIL}X" == "trueX" ];then
-#			wrLog "-I-		Sending USER:${user} warning alert mail on areas that haven't accessed $WARN days ago"
-#			WARN_MSG | mail -s "Automatic cleaning on $FILESYSTEM - WARNING" -r "${SENDER} ${SENDER_MAIL}" ${user}@mellanox.com
-#		fi
 		if [ ! -d "${USERLOGFILEPATH}/${user}" ];then
 			mkdir ${USERLOGFILEPATH}/${user}
 		fi
@@ -226,13 +222,10 @@ for project in $(ls ${MountPoint}/ | grep -Ev ${PROJECT_REVOKE_LIST});do
 			wrLog "-D-		Deleting areas older than ${TTL} days: ${DEL_AREA[*]}"
 			for object in ${DEL_AREA[@]};do
 				wrLog "rm -rf ${MountPoint}/${project}/${user}/${object}"
+#				rm -rf ${MountPoint}/${project}/${user}/${object}
 				wrLog "-D-		Deleting area ${object} completed"
 			done
 		fi
-#		if [ "${USEMAIL}X" == "trueX" ];then
-#			wrLog "-I-		Sending USER:${user} mail on areas to delete which exceeded access time of $TTL days ago"
-#			DEL_MSG | mail -s "Automatic cleaning on $FILESYSTEM - DELETION" -r "${SENDER} ${SENDER_MAIL}" ${user}@mellanox.com
-#		fi
 		if [ ! -d ${USERLOGFILEPATH}/${user} ];then
 			mkdir ${USERLOGFILEPATH}/${user}
 		fi
