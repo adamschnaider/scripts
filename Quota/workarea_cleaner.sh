@@ -164,7 +164,7 @@ fi
 wrLog "-I- MOUNTPOINT ${MountPoint} CREATED"
 wrLog "-I- TRYING TO MOUNT NFS PATH ${NFS_PATH} TO ${MountPoint}..." 
 if ! /bin/mount ${NFS_PATH} ${MountPoint};then
-	wrLog "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}, terminatting"
+	wrLog "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}, terminating"
 	sendMail "${sender}" "-E- FAILED TO MOUNT ${NFS_PATH} TO ${MountPoint}" $(getMails $MAIL_GROUP)
     	die
 fi
@@ -261,7 +261,7 @@ fi
 wrLog "-I- CLEANING PROCEDURE FINISHED"
 wrLog "-I- TRYING TO UNMOUNT ${MountPoint} "
 if ! /bin/umount ${MountPoint};then
-	wrLog "-E- FAILED TO UNMOUNT ${MountPoint}, terminatting"
+	wrLog "-E- FAILED TO UNMOUNT ${MountPoint}, terminating"
 	sendMail "${sender}" "-E- FAILED TO UNMOUNT ${MountPoint}" $(getMails $MAIL_GROUP)
     	die
 fi
@@ -269,7 +269,7 @@ fi
 wrLog "-I- ${MountPoint} UNMOUNTED"
 wrLog "-I- TRYING TO REMOVE MOUNTPOINT ${MountPoint}"
 if ! /bin/rmdir ${MountPoint};then
-	wrLog "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}, terminatting"
+	wrLog "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}, terminating"
 	sendMail "${sender}" "-E- FAILED TO REMOVE DIRECTORY ${MountPoint}" $(getMails $MAIL_GROUP)
     	die
 fi
