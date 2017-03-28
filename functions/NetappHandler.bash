@@ -116,7 +116,7 @@ netapp_7mode_vol_resize() {
 	[[ $filer != $(netapp_vfiler_check $filer) ]] && vfiler=$filer && filer=$(netapp_vfiler_check $filer)
 	[[ ! -z $size ]] && ssh root@${filer} vol size $volume $size
 	[[ ! -z $vfiler ]] && filer=$vfiler
-	echo "$ID,$filer,$volume,$size,$vol_usage,$aggr,${local_aggr_usage}%,${local_aggr_free_space}GB,X,,,,,,`date +%d/%m/%y`,`date +%R`" >> $DIR/NEW_volResizer.csv
+	[[ ! -z $size ]] && echo "$ID,$filer,$volume,$size,$vol_usage,$aggr,${local_aggr_usage}%,${local_aggr_free_space}GB,X,,,,,,`date +%d/%m/%y`,`date +%R`" >> $DIR/NEW_volResizer.csv
 	echo -e "\n\e[032mDONE\e[0m"
 }
 

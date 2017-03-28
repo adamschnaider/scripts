@@ -6,6 +6,9 @@
 #               Date: Feb 2017          #
 #########################################
 
+## SOURCE TABLE CREATE CONFIGURATIONS
+. /root/scripts/functions/MySQLHandler.bash
+
 usage()
 {
 cat <<EOF
@@ -24,8 +27,6 @@ ACTION=$1
 DB=$2
 TABLE=$3
 CSV=$4
-
-storagesystems="create table storagesystems ( geo varchar(30), state varchar(30), city varchar(30), sla varchar(30), dept varchar(30), site varchar(30), building varchar(30), floor varchar(30), rack varchar(30), hostname varchar(30), name varchar(30), vendor varchar(30), model varchar(30), sn varchar(30), support varchar(30), warranty date, ip varchar(30), dfm varchar(30), rlm varchar(30), rlm_ip varchar(30), eol varchar(30), version varchar(30), future_plan varchar(30), comment varchar(30), primary key (hostname, sn));"
 
 DB_CHECK()
 {
@@ -91,6 +92,7 @@ case "${ACTION}" in
 		fi
 		ATTR_CHECK
 		TABLE_CREATE
+		echo "-I- DONE"
 		;;
 	load )
 		echo "-I- LOADING INTO TABLE ${TABLE}"
@@ -102,18 +104,20 @@ case "${ACTION}" in
 		fi
 		CSV_CHECK
 		TABLE_LOAD
+		echo "-I- DONE"
 		;;
 	refresh )
 		echo "-I- REFRESHING TABLE ${TABLE}"
 		DB_CHECK
+		ATTR_CHECK
 		TABLE_CHECK
 		if [ $? -eq 1 ];then
-			echo "-I- TABLE ${TABLE} AREADY EXISTS, DELETING AND RECREATING.."
+			echo "-I- TABLE ${TABLE} AREADY EXISTS, DELETING AND RECREATING"
 			DROP_TABLE
 		else
-			echo "-I- TABLE ${TABLE} DOES NOT EXISTS, CREATING.."
+			echo "-I- TABLE ${TABLE} DOES NOT EXISTS, CREATING"
 		fi
-		ATTR_CHECK
 		TABLE_CREATE
+		echo "-I- DONE"
 		;;
 esac
