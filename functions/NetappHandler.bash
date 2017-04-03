@@ -34,7 +34,7 @@ echo $1 | grep '^\+[0-9]*[gG]$' > /dev/null 2>&1
 # 4 - Can't reach 
 netapp_get_version() {
 	local filer=$1
-	ping_check $filer ; [[ $? -ne "0" ]] && return 4
+	#ping_check $filer ; [[ $? -ne "0" ]] && return 4
 	(nc -z $filer 22 >/dev/null 2>&1) || return 3
 	local fFiler=$(netapp_vfiler_check $filer) ; [[ $? = "0" ]] && filer=$fFiler
 	local version=$(ssh root@${filer} "version" | grep NetApp | awk '{print $4}'|sed 's/://')
@@ -120,10 +120,6 @@ netapp_7mode_vol_resize() {
 	echo -e "\n\e[032mDONE\e[0m"
 }
 
-netapp_cmode_vol_resize() {
-	echo "NULL"
-}
-
 
 netapp_7mode_snapmirror_handler() {
 	local filer=$1
@@ -185,6 +181,18 @@ netapp_7mode_snapmirror_handler() {
 		let snapmirror_counter=$snapmirror_counter-1
 	done
 #	echo -e "\n\e[032mDONE WITH REMOTE SYSTEMS\e[0m"
+}
+
+netapp_7mode_vol_type()
+{
+	local filer=$1
+	local volume=$2
+	local volume_type=$(ssh root@{filer} vol status -v ${volume} | grep -wE "flexcache|snapmirror" -B1)
+	
+}
+
+netapp_cmode_vol_resize() {
+	echo "NULL"
 }
 
 netapp_quota_handler() {

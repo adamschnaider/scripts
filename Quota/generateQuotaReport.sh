@@ -36,14 +36,19 @@ SELF_NAME=$($HOSTNAME -s)
                 DST_FILER=mtifseda
             ;;
             *)
-                NetAppList="mtlfs01 mtlfs03 labfs01 labfs02 mtrlabfs01 mtrlabfs02 mtdkfs01 mtdkfs02 manasfs1 manasfs2"
-		NetAppCdotList="mtbufsprd-mtbufshw"
+                NetAppList1="mtlfs01"
+                NetAppList2="mtlfs03 labfs01 labfs02 mtrlabfs01 mtrlabfs02 bond rdmzlabfs01 rdmzlabfs02"
+                NetAppList3="mtdkfs01 mtdkfs02 mtilabfs02"
+		NetAppCdotList="mtbufsprd-mtbufshw mtbufsprd-mtbufssw"
                 IsilonList="10g.mtlisilon"
-                ZFSList="mtlzfs01"
+                ZFSList1="mtlzfs01"
+                ZFSList2="mtlzfs02"
 		VNXList="vnx7600-cs0"
                 DST_FILER=mtlfs01
     esac
-
+    quotaReport_path=/${DST_FILER}/home/yokadm/tmp/quotaReport
+    quotaReport_path_tmp=/${DST_FILER}/home/yokadm/tmp/quotaReport/tmp
+    quotaReport_path_locks=/${DST_FILER}/home/yokadm/tmp/quotaReport/locks
     quota_file_path=/${DST_FILER}/home/yokadm/tmp/quotaOutFormatedAll.tmp
     quota_file_path_tmp=/${DST_FILER}/home/yokadm/tmp/quotaOutFormatedAllTemp.tmp
     isi_output_tmp=/${DST_FILER}/home/yokadm/tmp/isi_tmp
@@ -81,7 +86,9 @@ function initQuotaFile()
 function getVNXQuotas()
 {
 ssh root@ezhp "ypcat passwd" > $vnx_output_tmp
-for VNXHost in $VNXList ; do
+for VNXHost in $1 ; do
+        [ -f ${quotaReport_path_locks}/${VNXHost}.lock ] && return 1
+        touch ${quotaReport_path_locks}/${VNXHost}.lock
 	IFS=$'\n'
 	for share in $(executeViaSSH nasadmin@${VNXHost} "source /home/nasadmin/.bash_profile >/dev/null; nas_fs -list" | awk '$4 == "1" {print $0}'| awk '{print $7, $8}' |grep -v root) ; do
 		vnxDM=$(echo $share | awk '{print $2}')
@@ -117,9 +124,9 @@ for VNXHost in $VNXList ; do
 				fi
 			fi
 			if [ -z ${quotaUnlimited} ] ; then
-				printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+				printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${VNXHost}.quota
 			else
-				printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+				printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${VNXHost}.quota
 			fi
 			unset quotaUnlimited
 		done
@@ -152,20 +159,26 @@ for VNXHost in $VNXList ; do
                         fi
                 fi
 		if [ -z ${quotaUnlimited} ] ; then
-			printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+			printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${VNXHost}.quota
 		else
-			printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+			printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "vnxdm${vnxDM}" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${VNXHost}.quota
 		fi
 		unset quotaUnlimited
 	done
 	unset IFS
+        /bin/cp ${quotaReport_path_tmp}/${VNXHost}.quota ${quotaReport_path}/${VNXHost}.quota
+        /bin/rm -f ${quotaReport_path_tmp}/${VNXHost}.quota
+        /bin/rm -f ${quotaReport_path_locks}/${VNXHost}.lock
 done
+/bin/rm -f ${vnx_output_tmp}
 }
 
 function getZFSQuotas()
 {
 tmpDIR=/tmp
-for ZFSHost in $ZFSList ; do
+for ZFSHost in $1 ; do
+        [ -f ${quotaReport_path_locks}/${ZFSHost}.lock ] && return 1
+        touch ${quotaReport_path_locks}/${ZFSHost}.lock
 	IFS=$'\n'
 	for project in $(executeViaSSH $ZFSHost "shares list") ; do
 		for share in $(executeViaSSH $ZFSHost "shares select $project list"|tail -n +5 |awk '{print $1}') ; do
@@ -198,9 +211,9 @@ for ZFSHost in $ZFSList ; do
 					fi
 				fi
 				if [ -z ${quotaUnlimited} ] ; then
-					printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+					printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${ZFSHost}.quota
 				else
-					printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+					printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${ZFSHost}.quota
 				fi
 				unset quotaUnlimited
 			done
@@ -232,22 +245,26 @@ for ZFSHost in $ZFSList ; do
 			fi
 		fi
 		if [ -z ${quotaUnlimited} ] ; then
-			printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+			printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${ZFSHost}.quota
 		else
-			printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+			printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$ZFSHost" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${ZFSHost}.quota
 		fi
 		unset quotaUnlimited
 		done
 	done
 	unset IFS
+        /bin/cp ${quotaReport_path_tmp}/${ZFSHost}.quota ${quotaReport_path}/${ZFSHost}.quota
+        /bin/rm -f ${quotaReport_path_tmp}/${ZFSHost}.quota
+        /bin/rm -f ${quotaReport_path_locks}/${ZFSHost}.lock
 done
 }
 
 function getIsiQuotas()
 {
 tmpDIR=/tmp
-
-for IsiHost in $IsilonList ; do
+for IsiHost in $1 ; do
+    [ -f ${quotaReport_path_locks}/${IsiHost}.lock ] && return 1
+    touch ${quotaReport_path_locks}/${IsiHost}.lock
     executeViaSSH $IsiHost "isi quota list |sed 's/~//'| egrep -w 'user|group|directory' | egrep -v '^default-user|\*' " > ${isi_output_tmp}
     IFS=$'\n'
     for line in $(/bin/cat ${isi_output_tmp}) ; do
@@ -292,21 +309,26 @@ for IsiHost in $IsilonList ; do
             fi
         fi
 	    if [ -z ${quotaUnlimited} ] ; then
-                printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$IsiHost" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+                printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$IsiHost" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${IsiHost}.quota
 	    else
-		printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$IsiHost" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+		printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$IsiHost" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${IsiHost}.quota
 	    fi
         unset quotaUnlimited
         done
     /bin/rm -f ${isi_output_tmp}
     unset IFS
+    /bin/cp ${quotaReport_path_tmp}/${IsiHost}.quota ${quotaReport_path}/${IsiHost}.quota
+    /bin/rm -f ${quotaReport_path_tmp}/${IsiHost}.quota
+    /bin/rm -f ${quotaReport_path_locks}/${IsiHost}.lock
 done
 }
 
 function getNetAppQuotas()
 {
 tmpDIR=/tmp
-for filer in $NetAppList ; do
+for filer in $1 ; do
+        [ -f ${quotaReport_path_locks}/${filer}.lock ] && return 1
+        touch ${quotaReport_path_locks}/${filer}.lock
 	IFS=$'\n'
 	host=$filer
 	for line in $($RSH $host "quota report" |grep -w -v root |  tail -n +4 | grep -v Adminis|grep -v terminalProfiles) ; do
@@ -352,19 +374,24 @@ for filer in $NetAppList ; do
 			fi
         	fi
 		if [ -z ${quotaUnlimited} ] ; then
-			printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$host" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+			printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$host" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${filer}.quota
 		else
-			printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$host" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+			printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$host" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${filer}.quota
 		fi
 		unset quotaUnlimited
 	done
+        /bin/cp ${quotaReport_path_tmp}/${filer}.quota ${quotaReport_path}/${filer}.quota
+        /bin/rm -f ${quotaReport_path_tmp}/${filer}.quota
+        /bin/rm -f ${quotaReport_path_locks}/${filer}.lock
 done
 unset IFS
 }
 function getNetAppCdotQuotas()
 {
 tmpDIR=/tmp
-for filer in $NetAppCdotList ; do
+for filer in $1 ; do
+        [ -f ${quotaReport_path_locks}/${filer}.lock ] && return 1
+        touch ${quotaReport_path_locks}/${filer}.lock
         IFS=$'\n'
         host=$(echo $filer | awk -F'-' '{print $1}')
 	vserver=$(echo $filer | awk -F'-' '{print $2}')
@@ -411,12 +438,15 @@ for filer in $NetAppCdotList ; do
                         fi
                 fi
                 if [ -z ${quotaUnlimited} ] ; then
-                        printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$vserver" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+                        printf '%-15s %-12s %-15s %-40s %-9.1f %-9.2f %-9s\n' "$vserver" "$objtype" "$username" "$path" "$quotaG" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${filer}.quota
                 else
-                        printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$vserver" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quota_file_path_tmp}
+                        printf '%-15s %-12s %-15s %-40s %-9s %-9.2f %-9s\n' "$vserver" "$objtype" "$username" "$path" "0" "$usedG" "${usedPrcnt//.*}" >> ${quotaReport_path_tmp}/${filer}.quota
                 fi
                 unset quotaUnlimited
         done
+        /bin/cp ${quotaReport_path_tmp}/${filer}.quota ${quotaReport_path}/${filer}.quota
+        /bin/rm -f ${quotaReport_path_tmp}/${filer}.quota
+        /bin/rm -f ${quotaReport_path_locks}/${filer}.lock
 done
 unset IFS
 }
@@ -428,10 +458,13 @@ function postActivities()
 }
 setConfigBySite
 initQuotaFile
-getVNXQuotas
-getZFSQuotas
-getNetAppQuotas
-getNetAppCdotQuotas
-getIsiQuotas
-postActivities
+getVNXQuotas "$VNXList" &
+getZFSQuotas "$ZFSList1" &
+getZFSQuotas "$ZFSList2" &
+getNetAppQuotas "$NetAppList1" &
+getNetAppQuotas "$NetAppList2" &
+getNetAppQuotas "$NetAppList3" &
+getNetAppCdotQuotas "$NetAppCdotList" &
+getIsiQuotas "$IsilonList" &
+#postActivities
 /bin/rm -f $LOCKFILE
