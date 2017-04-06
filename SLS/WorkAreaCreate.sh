@@ -156,7 +156,7 @@ case "$workdir" in
 		zfs_workdir /mnt/mtlzfs01_${workdir} $user 170 755
 		;;
 	GL/[a-z]*/[a-z]* )
-		isilon_workdir /ifs/MLNX_DATA/FE/${workdir} $user mtl 755
+		zfs_workdir /mnt/mtlzfs02_${workdir} $user mtl 755
 		;;
 	backend4/[a-z]* | hertmp2/[a-z]* | hertmp3/[a-z]* | hertmp4/[a-z]* )
 		zfs_workdir /mnt/mtlzfs01_${workdir} $user layout 755
