@@ -21,10 +21,15 @@ Usage:
 
 Usage like:
 	$0 -n filer01 -v mswg -d filer02
-OR
+	OR
 	$0 -n filer01 -v mswg -s MTR,MTV,MTI
 EOF
 exit 1
+}
+
+quit()
+{
+exit $1
 }
 
 [[ $# -lt 6 ]] && usage
@@ -53,7 +58,19 @@ done
 
 echo $filer $volume $dst_filer $site
 
-ping_check $filer || (echo "-E- CAN'T REACH SOURCE FILER: ${filer}" )
-[[ ! -z $dst_filer ]] && (ping_check $dst_filer || (echo "-E- CAN'T REACH DESTINATION FILER: ${dst_filer}"))
+if ! ping_check $filer ; then
+	echo "-E- CAN'T REACH SOURCE FILER: ${filer}"
+	exit 1
+fi
+if [[ ! -z $dst_filer && ! -z $site ]]; then
+	echo "-E- USE '-s' OR '-d', NOT BOTH"
+	exit 1
+fi
+if [[ ! -z $dst_filer ]] ; then
+	if ! ping_check $dst_filer ; then
+		echo "-E- CAN'T REACH DESTINATION FILER: ${dst_filer}"
+		exit 1
+	fi
+fi
 
 
