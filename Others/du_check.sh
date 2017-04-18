@@ -53,4 +53,4 @@ rm -f ${LOGDIR}/du.lock.file
 rm -f $TMPFILE
 cp ${LOGDIR}/du.big_files.out.txt ${LOGDIR}/du.big_files.out.`date +%d%m%y`.txt
 echo -e "`date`:\n/.autodirect/spe/* details" | mail -r du_check@mtlstadm01.mtl.com -s "SPE FILESYSTEM USAGE" -a ${LOGDIR}/du.big_files.out.txt -a ${LOGDIR}/du.out.$$.txt -- it_storage@mellanox.com eamar@mellanox.com
-mv ${LOGDIR}/du.out.$$.txt ${LOGDIR}
+#mv ${LOGDIR}/du.out.$$.txt ${LOGDIR}
