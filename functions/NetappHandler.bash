@@ -8,6 +8,7 @@
 
 ID=$RANDOM
 DIR=`dirname $0`
+NetappScripts="/root/scripts/Netapp"
 
 # Args: filer hostname/ip
 # Return codes:
@@ -187,8 +188,26 @@ netapp_7mode_vol_type()
 {
 	local filer=$1
 	local volume=$2
-	local volume_type=$(ssh root@{filer} vol status -v ${volume} | grep -wE "flexcache|snapmirror" -B1)
-	
+	${NetappScripts}/volume_type.py $filer $volume
+	case "$?" in
+		0 )
+			echo "volume"
+			return 0
+			;;
+		1 )
+			echo "error"
+			return 1
+			;;
+		2 )
+			echo "flexcache"
+			return 2
+			;;
+		3 )
+			echo "snapmirrored"
+			return 3
+			;;
+			
+	esac
 }
 
 netapp_cmode_vol_resize() {

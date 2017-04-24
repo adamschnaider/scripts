@@ -12,13 +12,13 @@ def print_usage():
     sys.exit (1)
 
 args = len(sys.argv) - 1
-if(args < 3):
+if(args < 2):
    print_usage()
 
 filer = sys.argv[1]
-user = sys.argv[2]
+user = "ankor"
 password = "ank0r!"
-volume = sys.argv[3]
+volume = sys.argv[2]
 
 s = NaServer(filer, 1,0)
 s.set_admin_user(user, password)
@@ -37,7 +37,7 @@ for option in ret.children_get():
         else : 
             if(option.child_get_string("value") == "partial"):
                 sys.exit (2)
-    if(option.child_get_string("value") == "snapmirrored"):
+    if(option.child_get_string("name") == "snapmirrored"):
         if(option.child_get_string("value") == "on"):
             sys.exit (3)
 
