@@ -17,7 +17,7 @@ usage()
 cat <<EOF
 This utility use to create Netapp 7-Mode FlexCache Volumes
 Usage:
-	$0 -n <src filer> -v <src volume> [-d <dst filer> | -s <site1,site2,site3>]
+	$0 -n <src filer> -v <src volume> [ -d <dst filer> | -s <site1,site2,site3> ]
 
 Usage like:
 	$0 -n filer01 -v mswg -d filer02
@@ -62,10 +62,12 @@ if ! ping_check $filer ; then
 	echo "-E- CAN'T REACH SOURCE FILER: ${filer}"
 	exit 1
 fi
+
 if [[ ! -z $dst_filer && ! -z $site ]]; then
 	echo "-E- USE '-s' OR '-d', NOT BOTH"
 	exit 1
 fi
+
 if [[ ! -z $dst_filer ]] ; then
 	if ! ping_check $dst_filer ; then
 		echo "-E- CAN'T REACH DESTINATION FILER: ${dst_filer}"
