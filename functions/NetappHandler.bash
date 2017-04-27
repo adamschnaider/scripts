@@ -188,7 +188,7 @@ netapp_7mode_vol_type()
 {
 	local filer=$1
 	local volume=$2
-	${NetappScripts}/volume_type.py $filer $volume
+	${NetappScripts}/netapp_7mode_vol_type.py $filer $volume
 	case "$?" in
 		0 )
 			echo "volume"
@@ -208,6 +208,12 @@ netapp_7mode_vol_type()
 			;;
 			
 	esac
+}
+
+netapp_7mode_list_aggr()
+{
+	local filer=$1
+	${NetappScripts}/netapp_7mode_list_aggr.py $filer
 }
 
 netapp_cmode_vol_resize() {

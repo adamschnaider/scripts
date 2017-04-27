@@ -56,8 +56,6 @@ while (( "$#" )); do
 	shift
 done
 
-echo $filer $volume $dst_filer $site
-
 if ! ping_check $filer ; then
 	echo "-E- CAN'T REACH SOURCE FILER: ${filer}"
 	exit 1
@@ -68,11 +66,21 @@ if [[ ! -z $dst_filer && ! -z $site ]]; then
 	exit 1
 fi
 
+if ! netapp_7mode_vol_type $filer $volume>/dev/null ; then
+	echo "-E- ERROR WITH SOURCE VOLUME TYPE"
+	exit 1
+fi
+
 if [[ ! -z $dst_filer ]] ; then
 	if ! ping_check $dst_filer ; then
 		echo "-E- CAN'T REACH DESTINATION FILER: ${dst_filer}"
 		exit 1
 	fi
+	aggr_list=$(netapp_7mode_list_aggr $dst_filer)
+	echo "${aggr_list}"
+	echo "Please enter desired aggregate name: "
+	read aggr
+	if ! $(echo "$aggr_list" |awk '{print $2}' | grep -owq $aggr > /dev/null 2>&1) ; then
+		echo "-E- WRONG AGGREGATE CHOSEN ON ${dst_filer}"
+	fi
 fi
-
-

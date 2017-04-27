@@ -5,10 +5,9 @@ from NaServer import *
 from NaElement import *
 
 def print_usage():
-    print ("Usage: hello_ontapi.py <filer> <user> <password> \n")
+    print ("Usage: %s <filer> <user> <password> \n" %(sys.argv[0]))
     print ("<filer> -- Filer name\n")
-    print ("<user> -- User name\n")
-    print ("<password> -- Password\n")
+    print ("<volume> -- Volume name\n")
     sys.exit (1)
 
 args = len(sys.argv) - 1
@@ -30,6 +29,7 @@ if(output.results_errno() != 0):
     sys.exit (1)
 
 ret=output.child_get("options")
+regular=0
 for option in ret.children_get():
     if(option.child_get_string("name") == "actual_guarantee"):
         if(option.child_get_string("value") == "volume"):
@@ -41,4 +41,7 @@ for option in ret.children_get():
         if(option.child_get_string("value") == "on"):
             sys.exit (3)
 
-sys.exit (0)
+if(regular == 1):
+    sys.exit (0)
+else :
+    sys.exit (1)
