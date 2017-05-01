@@ -36,12 +36,15 @@ for option in ret.children_get():
     		regular=1
         else : 
             if(option.child_get_string("value") == "partial"):
+                print ("flexcache")
                 sys.exit (2)
     if(option.child_get_string("name") == "snapmirrored"):
         if(option.child_get_string("value") == "on"):
+            print ("snapmirrored")
             sys.exit (3)
 
 if(regular == 1):
+    print ("volume")
     sys.exit (0)
 else :
     sys.exit (1)

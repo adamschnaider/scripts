@@ -189,25 +189,6 @@ netapp_7mode_vol_type()
 	local filer=$1
 	local volume=$2
 	${NetappScripts}/netapp_7mode_vol_type.py $filer $volume
-	case "$?" in
-		0 )
-			echo "volume"
-			return 0
-			;;
-		1 )
-			echo "error"
-			return 1
-			;;
-		2 )
-			echo "flexcache"
-			return 2
-			;;
-		3 )
-			echo "snapmirrored"
-			return 3
-			;;
-			
-	esac
 }
 
 netapp_7mode_list_aggr()

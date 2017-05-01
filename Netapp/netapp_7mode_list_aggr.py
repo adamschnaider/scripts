@@ -28,5 +28,6 @@ for aggr in ret.children_get():
 	aggr_name=aggr.child_get_string("name")
 	aggr_used=aggr.child_get_int("size-used")/1024/1024/1024
 	aggr_total=aggr.child_get_int("size-total")/1024/1024/1024
+	aggr_free=aggr.child_get_int("size-available")/1024/1024/1024
 	aggr_used_perc=aggr.child_get_int("size-percentage-used")
-	print ("Name: %s " %aggr_name + "\t Used: %d" %(aggr_used) + "GB" + "\t Total: %d" %(aggr_total) + "GB" + "\t Percent: %d" %(aggr_used_perc) + "%")
+	print ("Name: %s " %aggr_name + "\t Total: %d" %(aggr_total) + "GB" + "\t Used: %d" %(aggr_used) + "GB" + "\t Avail: %d" %(aggr_free) + "GB" + "\t Percent: %d" %(aggr_used_perc) + "%")
