@@ -31,4 +31,4 @@ if [[ ! -f ${XLSX} ]]; then
 fi
 
 ## CONVERT
-${base_path}/xlsx2csv-0.7.2/xlsx2csv.py ${XLSX} ${CSV}
+${base_path}/xlsx2csv/xlsx2csv.py ${XLSX} ${CSV}

@@ -56,8 +56,9 @@ elif [ $count -eq 0 ] ; then
 fi
 
 ## Quota fully detailed
-QUOTA=$(ssh ${HOST} shares select ${SHARE} select ${FILESYSTEM} users list | awk -v directory=$dir '{print "user" ,$2,directory,$3,$4}' |grep $username)
+QUOTA=$(ssh ${HOST} shares select ${SHARE} select ${FILESYSTEM} users list | awk -v directory=$dir '{print "user" ,$2,directory,$3,$4}' |grep -w $username)
 [[ -z $QUOTA ]] && echo -e "ERROR: No user quota for user $username on $dir" && exit 1
+[[ $(echo "$QUOTA" | wc -l) -gt 1 ]] && echo -e "ERROR: Found more than one user quota for user $username on $dir" && exit 1
 
 ## Current quota
 echo -e "Current quota:"

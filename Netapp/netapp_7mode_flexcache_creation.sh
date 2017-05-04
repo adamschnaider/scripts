@@ -32,6 +32,8 @@ quit()
 exit $1
 }
 
+create_flexcache()
+{
 [[ $# -lt 10 ]] && usage
 
 while (( "$#" )); do
@@ -80,7 +82,7 @@ fi
 if [[ ! -z $dst_filer ]] ; then
 	if ! ping_check $dst_filer ; then
 		echo "-E- CAN'T REACH DESTINATION FILER: ${dst_filer}"
-		exit 1
+		return 1
 	fi
 	if ! echo $dst_vol_size | grep -q '^[0-9]*[gG]$' ; then
 		echo "-E- INVALID SIZE ENTERED"
@@ -88,21 +90,22 @@ if [[ ! -z $dst_filer ]] ; then
 		exit 1
 	fi
 	aggr_list=$(netapp_7mode_list_aggr $dst_filer)
+	echo -e "\nPlease choose aggregate from ${dst_filer}:"
 	echo "${aggr_list}"
 	echo "Please enter desired aggregate name: "
 	read dst_aggr
 	if ! $(echo "$aggr_list" |awk '{print $2}' | grep -owq $dst_aggr > /dev/null 2>&1) ; then
-		echo "-E- WRONG AGGREGATE CHOSEN FOR ${dst_filer}"
-		exit 1
+		echo "-E- WRONG AGGREGATE CHOSEN FOR ${dst_filer}, FLEXCACHE VOLUME WASN'T CREATED"
+		return 1
 	fi
 	netapp_7mode_vol_type $dst_filer $dst_volume > /dev/null
 	if [[ "$?" -ne 1 ]] ; then
 		echo "-E- VOLUME: $dst_volume ALREADY EXISTS ON DESTINATION: $dst_filer"
-		exit 1
+		return 1
 	fi
 	if [[ $(netapp_7mode_list_aggr $dst_filer | grep -w $dst_aggr | awk '{print $8}' | sed 's/GB$//') -le $(echo $dst_vol_size | sed 's/[gG]$//') ]] ; then
 		echo "-E- NOT ENOUGH FREE SPACE ON AGGR: $dst_aggr, FILER: $dst_filer"
-		exit 1
+		return 1
 	fi
 	
 	## FlexCache creation process:
@@ -110,7 +113,7 @@ if [[ ! -z $dst_filer ]] ; then
 	echo -e "-I- FLEXCACHE DETAILS:\n SOURCE FILER: $filer \n SOURCE VOLUME: $volume \n DESTINATION FILER: $dst_filer \n DESTINATION VOLUME: $dst_volume \n DESTINATION AGGR: $dst_aggr"
 	echo "PRESS ENTER TO CONTINUE OR CTRL+C TO EXIT"
 	read answer
-	echo "-E- ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}"
+	echo "-I- ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}"
 	#ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}
 fi
 
@@ -119,6 +122,17 @@ if [[ ! -z $sites ]]; then
 		echo "-E- MySQL NOT RUNNING, CAN'T QUERY SITES FILERS"
 		exit 1
 	fi
+
 	### MYSQL QUERY:
-	### mysql MLNX -B --skip-column-names -e "select site,max(hostname),ip from storagesystems where vendor='Netapp' and hostname not regexp '-old$' and hostname regexp 'lab' group by site" |grep -wE "MTL|MTI|LDMZ"
+	sites=$(echo $sites | sed 's/,/\|/g')
+	echo "-I- FOLLOWING SITES CHOSEN:"
+	mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}"
+	for i in $(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}" | awk '{print $3}')
+	do
+		unset sites
+		create_flexcache -n $filer -v $volume -d $i -f $dst_volume -g $dst_vol_size
+	done
 fi	
+}
+
+create_flexcache $@
