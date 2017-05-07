@@ -64,6 +64,11 @@ while (( "$#" )); do
 	shift
 done
 
+if ! check_mysql ; then
+	echo "-E- MySQL NOT RUNNING, CAN'T QUERY SITES FILERS"
+	exit 1
+fi
+
 if ! ping_check $filer ; then
 	echo "-E- CAN'T REACH SOURCE FILER: ${filer}"
 	exit 1
@@ -115,14 +120,17 @@ if [[ ! -z $dst_filer ]] ; then
 	read answer
 	echo "-I- RUNNING COMMAND: ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}"
 	ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}
+	
+	## Setting exports:
+	exports=$(mysql MLNX -B --skip-column-names -e "set @filer='${dst_filer}' ; select lab from exports where site=(select site from storagesystems where vendor='Netapp' and hostname=@filer or ip=@filer)")
+	if [[ -z $exports ]]; then
+		echo "-W NO EXPORTS CONFIGURATION FOUND, VOLUME CREATED WITH DEFAULT EXPORTS"
+	else
+		ssh root@${dst_filer} "exportfs -p sec=sys,rw=${exports}:10.0.10.100:10.4.0.123,root=10.0.10.100:10.4.0.123 /vol/${dst_volume}"
+	fi
 fi
 
 if [[ ! -z $sites ]]; then
-	if ! check_mysql ; then
-		echo "-E- MySQL NOT RUNNING, CAN'T QUERY SITES FILERS"
-		exit 1
-	fi
-
 	### MYSQL QUERY:
 	sites=$(echo $sites | sed 's/,/\|/g')
 	output=$(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}")
@@ -131,6 +139,7 @@ if [[ ! -z $sites ]]; then
 		exit 1
 	fi
 	echo "-I- FOLLOWING SITES CHOSEN:"
+	echo "$output"
 	for i in $(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}" | awk '{print $3}')
 	do
 		unset sites
