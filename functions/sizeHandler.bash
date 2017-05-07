@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+# Input: size string in form of: [0-9]T, [0-9]G, [0-9]M, [0-9]b, [0-9]
+# Output: float number - size in G
 getScaleInG()
 {
         local property=$1

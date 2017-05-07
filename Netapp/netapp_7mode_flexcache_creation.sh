@@ -113,8 +113,8 @@ if [[ ! -z $dst_filer ]] ; then
 	echo -e "-I- FLEXCACHE DETAILS:\n SOURCE FILER: $filer \n SOURCE VOLUME: $volume \n DESTINATION FILER: $dst_filer \n DESTINATION VOLUME: $dst_volume \n DESTINATION AGGR: $dst_aggr"
 	echo "PRESS ENTER TO CONTINUE OR CTRL+C TO EXIT"
 	read answer
-	echo "-I- ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}"
-	#ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}
+	echo "-I- RUNNING COMMAND: ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}"
+	ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}
 fi
 
 if [[ ! -z $sites ]]; then
@@ -125,8 +125,12 @@ if [[ ! -z $sites ]]; then
 
 	### MYSQL QUERY:
 	sites=$(echo $sites | sed 's/,/\|/g')
+	output=$(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}")
+	if [[ -z $output ]]; then
+		echo "-E- NO RECORDS ARE MATCHING THE SITES ENTERED"
+		exit 1
+	fi
 	echo "-I- FOLLOWING SITES CHOSEN:"
-	mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}"
 	for i in $(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}" | awk '{print $3}')
 	do
 		unset sites
