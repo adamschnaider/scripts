@@ -122,7 +122,7 @@ if [[ ! -z $dst_filer ]] ; then
 	ssh root@${dst_filer} vol create $dst_volume $dst_aggr $dst_vol_size -S ${filer}:${volume}
 	
 	## Setting exports:
-	exports=$(mysql MLNX -B --skip-column-names -e "set @filer='${dst_filer}' ; select lab from exports where site=(select site from storagesystems where vendor='Netapp' and hostname=@filer or ip=@filer)")
+	exports=$(mysql MLNX -B --skip-column-names -e "set @filer='${dst_filer}' ; select lab from exports where site=(select site from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' and (hostname=@filer or ip=@filer))")
 	if [[ -z $exports ]]; then
 		echo "-W NO EXPORTS CONFIGURATION FOUND, VOLUME CREATED WITH DEFAULT EXPORTS"
 	else
@@ -140,7 +140,7 @@ if [[ ! -z $sites ]]; then
 	fi
 	echo "-I- FOLLOWING SITES CHOSEN:"
 	echo "$output"
-	for i in $(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}" | awk '{print $3}')
+	for i in $(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}" | awk '{print $2}')
 	do
 		unset sites
 		create_flexcache -n $filer -v $volume -d $i -f $dst_volume -g $dst_vol_size
