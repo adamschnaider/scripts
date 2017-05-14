@@ -33,6 +33,7 @@ if ! ypmatch ${username} passwd > /dev/null 2>&1; then echo -e "ERROR: User does
 
 ## Find requested share and count
 count=0
+found=0
 for host in $ZFSHOSTS; do
 	for share in $(ssh $host "shares list"); do
 		for filesystem in $(ssh $host shares select $share list | tail -n +5 | awk '{print $1}') ; do
@@ -42,9 +43,13 @@ for host in $ZFSHOSTS; do
 				HOST=$host
 				SHARE=$share
 				FILESYSTEM=$filesystem
+				found=1
+				break
 			fi
 		done
+	[[ $found -eq "1" ]] && break
 	done
+[[ $found -eq "1" ]] && break
 done
 
 if [ $count -gt 1 ] ; then
@@ -72,7 +77,7 @@ resize_check $size
 
 ## Check if quota entered is less than current quota
 current_quota=$(getScaleInG $(echo $QUOTA | awk '{print $5}')) && current_quota=${current_quota%%.*}
-current_used=$(getScaleInG $(echo $QUOTA | awk '{print $4}')) && current_used=${current_used%%.*}
+current_used=$(getScaleInG $(echo $QUOTA | awk '{print $4}')) && current_used=$(echo "scale=0;${current_used} / 1" | bc -l)
 if ([ $(echo $QUOTA | awk '{print $5}') != "-" -a $current_quota -ge ${size%%G*} ] || [ $(echo $QUOTA | awk '{print $5}') = "-" -a $current_used -ge ${size%%G*} ]) &&  [ "$force" != "yes" ] ; then
         echo -e "ERROR: Quota entered is less than OR equal to current user quota"
         exit 1

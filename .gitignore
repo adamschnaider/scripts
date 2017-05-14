@@ -1,2 +1,3 @@
 logs
-*.py
+*.pem
+*.key
