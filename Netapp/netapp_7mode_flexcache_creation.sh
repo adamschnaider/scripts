@@ -133,14 +133,14 @@ fi
 if [[ ! -z $sites ]]; then
 	### MYSQL QUERY:
 	sites=$(echo $sites | sed 's/,/\|/g')
-	output=$(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}")
+	output=$(mysql MLNX -B --skip-column-names -e "select site,hostname,ip from storagesystems as A where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site,hostname,ip having hostname<=all(select hostname from storagesystems as B where B.vendor='Netapp' and B.flexcache='true' and B.hostname not regexp '-old$' and A.site=B.site group by site)" |grep -wE "${sites}")
 	if [[ -z $output ]]; then
 		echo "-E- NO RECORDS ARE MATCHING THE SITES ENTERED"
 		exit 1
 	fi
 	echo "-I- FOLLOWING SITES CHOSEN:"
 	echo "$output"
-	for i in $(mysql MLNX -B --skip-column-names -e "select site,min(hostname),ip from storagesystems where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site" |grep -wE "${sites}" | awk '{print $2}')
+	for i in $(mysql MLNX -B --skip-column-names -e "select site,hostname,ip from storagesystems as A where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site,hostname,ip having hostname<=all(select hostname from storagesystems as B where B.vendor='Netapp' and B.flexcache='true' and B.hostname not regexp '-old$' and A.site=B.site group by site)" |grep -wE "${sites}" | awk '{print $2}')
 	do
 		unset sites
 		create_flexcache -n $filer -v $volume -d $i -f $dst_volume -g $dst_vol_size
