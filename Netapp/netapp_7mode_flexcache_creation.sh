@@ -157,10 +157,10 @@ if [[ ! -z $sites ]]; then
 	fi
 	echo "-I- FOLLOWING SITES CHOSEN:"
 	echo "$output"
-	for i in $(mysql MLNX -B --skip-column-names -e "select site,hostname,ip from storagesystems as A where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site,hostname,ip having hostname<=all(select hostname from storagesystems as B where B.vendor='Netapp' and B.flexcache='true' and B.hostname not regexp '-old$' and A.site=B.site group by site)" |grep -wE "${sites}" | awk '{print $2}')
+	for host in $(mysql MLNX -B --skip-column-names -e "select site,hostname,ip from storagesystems as A where vendor='Netapp' and flexcache='true' and hostname not regexp '-old$' group by site,hostname,ip having hostname<=all(select hostname from storagesystems as B where B.vendor='Netapp' and B.flexcache='true' and B.hostname not regexp '-old$' and A.site=B.site group by site)" |grep -wE "${sites}" | awk '{print $2}')
 	do
 		unset sites
-		create_flexcache -n $filer -v $volume -d $i -f $dst_volume -g $dst_vol_size -o $perms
+		create_flexcache -n $filer -v $volume -d $host -f $dst_volume -g $dst_vol_size -o $perms
 	done
 fi	
 }

@@ -28,4 +28,4 @@ volumes="CREATE TABLE volumes (hostname varchar(30),vol varchar(30),state varcha
 
 contacts="CREATE TABLE contacts (name varchar(30),mail varchar(30),PRIMARY KEY (name))"
 
-thresholds="CREATE TABLE thresholds (name varchar(30), FOREIGN KEY (name) REFERENCES contacts(name), id varchar(50), FOREIGN KEY (id) REFERENCES volumes(id), threshold varchar(3),PRIMARY KEY (name,id))"
+thresholds="CREATE TABLE thresholds (name varchar(30), FOREIGN KEY (name) REFERENCES contacts(name), id varchar(50), FOREIGN KEY (id) REFERENCES volumes(id), threshold varchar(3) not null,PRIMARY KEY (name,id))"

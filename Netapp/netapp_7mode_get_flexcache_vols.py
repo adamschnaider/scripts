@@ -18,6 +18,9 @@ s = NaServer(filer, 1,0)
 s.set_transport_type("HTTPS")
 cmd=NaElement("volume-list-info")
 ret=s.invoke_elem(cmd)
+if(ret.results_errno() != 0):
+    print("-E- CONNECTION ERROR")
+    sys.exit (1)
 output=ret.child_get("volumes")
 for option in output.children_get():
 	if(option.child_get_string("space-reserve") == "partial"):

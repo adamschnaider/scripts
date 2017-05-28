@@ -21,8 +21,8 @@ cmd=NaElement("volume-options-list-info")
 cmd.child_add_string("volume",volume)
 output=s.invoke_elem(cmd)
 if(output.results_errno() != 0):
+    print("-E- COONECTION ERROR")
     sys.exit (1)
-
 ret=output.child_get("options")
 regular=0
 for option in ret.children_get():

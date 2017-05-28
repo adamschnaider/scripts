@@ -14,14 +14,14 @@ usage()
 cat <<EOF
 This utility use to create/load/refresh MySQL table
 Usage:
-	$0 <create|load|refresh> <MySQL DB> <MySQL Table> <CSV File>
+	$0 <check|create|load|refresh> <MySQL DB> <MySQL Table> <CSV File>
 EOF
 exit 1
 }
 
 [[ $# -ne 4 && $# -ne 3 ]] && usage
 
-[[ $1 != "refresh" && $1 != "create" && $1 != "load" ]] && usage
+[[ $1 != "refresh" && $1 != "create" && $1 != "load" && $1 != "check" ]] && usage
 
 ACTION=$1
 DB=$2
@@ -119,5 +119,17 @@ case "${ACTION}" in
 		fi
 		TABLE_CREATE
 		echo "-I- DONE"
+		;;
+	check )
+		echo "-I- CHECKING DB:"
+		DB_CHECK
+		echo "-I- DB OK"
+		echo "-I- CHECKING TABLE:"
+		TABLE_CHECK
+		if [ $? -eq 0 ]; then
+			echo "-E- TABLE DOES NOT EXISTS, USE CREATE/REFRESH"
+			exit 1
+		fi
+		echo "-I- TABLE OK"
 		;;
 esac

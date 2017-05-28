@@ -2,7 +2,7 @@
 
 ### Netapp License Monitoring
 
-THRESHOLD="15"	# in days
+THRESHOLD="10"	# in days
 
 EXP_LICENSE=$(ssh admin@mtlfsprd "system license show -owner mtlfsprd -expiration < $(date -d ${THRESHOLD}\ days +%m/%d/%Y\ %T)" | grep demo)
 

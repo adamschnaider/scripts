@@ -18,6 +18,9 @@ s = NaServer(filer, 1,0)
 s.set_transport_type("HTTPS")
 cmd=NaElement("aggr-list-info")
 output=s.invoke_elem(cmd)
+if(output.results_errno() != 0):
+    print("-E- COONECTION ERROR")
+    sys.exit (1)
 ret=output.child_get("aggregates")
 for aggr in ret.children_get():
 	aggr_name=aggr.child_get_string("name")

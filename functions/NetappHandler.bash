@@ -202,5 +202,5 @@ netapp_cmode_vol_resize() {
 }
 
 netapp_quota_handler() {
-echo "NULL"
+	echo "NULL"
 }
