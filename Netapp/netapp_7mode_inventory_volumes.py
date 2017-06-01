@@ -26,6 +26,13 @@ output1=ret1.child_get("volumes")
 for option in output1.children_get():
 	vol_name=option.child_get_string("name")
 	vol_state=option.child_get_string("state")
+	vol_id=option.child_get_string("uuid")
+	vol_total=option.child_get_int("size-total")
+	vol_used=option.child_get_int("size-used")
+	if (vol_state == "online"):
+		vol_percent_used=int(round((float(vol_used)/float(vol_total))*100))
+	else:
+		vol_percent_used=0
 	cmd2=NaElement("volume-options-list-info")
 	cmd2.child_add_string("volume",vol_name)
 	output2=s.invoke_elem(cmd2)
@@ -37,10 +44,10 @@ for option in output1.children_get():
 				regular=1
 			else :
 				if(option2.child_get_string("value") == "partial"):
-					type="flexcache"
+					vol_type="flexcache"
 		if(option2.child_get_string("name") == "snapmirrored"):
 			if(option2.child_get_string("value") == "on"):
-				type="snapmirrored"
+				vol_type="snapmirrored"
 	if(regular == 1):
-		type="volume"
-	print(vol_name + " " + vol_state + " " + type)
+		vol_type="volume"
+	print(vol_name + " " + vol_state + " " + vol_type + " " + vol_id + " " + str(vol_percent_used))

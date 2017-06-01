@@ -17,6 +17,7 @@ if (len(sys.argv) > 1):
 else:
 	command=str(raw_input())
 cn=mysql.connector.connect(**config)
+cn.autocommit = True
 cur=cn.cursor()
 cur.execute(command)
 row=cur.fetchone()

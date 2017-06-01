@@ -24,7 +24,7 @@ storagesystems="CREATE TABLE storagesystems (geo varchar(30),state varchar(30),c
 
 exports="CREATE TABLE exports (site varchar(30),lab varchar(300),prod varchar(300),PRIMARY KEY (site))"
 
-volumes="CREATE TABLE volumes (hostname varchar(30),vol varchar(30),state varchar(20),type varchar(5),id varchar(50),used varchar(3),PRIMARY KEY (id))"
+volumes="CREATE TABLE volumes (hostname varchar(30),vol varchar(60),state varchar(20),type varchar(20),id varchar(50),used varchar(3),PRIMARY KEY (id))"
 
 contacts="CREATE TABLE contacts (name varchar(30),mail varchar(30),PRIMARY KEY (name))"
 

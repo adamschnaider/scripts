@@ -117,6 +117,10 @@ case "${ACTION}" in
 		else
 			echo "-I- TABLE ${TABLE} DOES NOT EXISTS, CREATING"
 		fi
+		if [ $? -eq 1 ];then
+			echo "-E- ERROR WITH REFRESHING TABLE: ${TABLE}"
+			exit 1
+		fi
 		TABLE_CREATE
 		echo "-I- DONE"
 		;;

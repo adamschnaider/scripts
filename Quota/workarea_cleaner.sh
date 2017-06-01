@@ -122,7 +122,8 @@ else
 	USER_REVOKE_LIST=""
 	PROJECT_REVOKE_LIST=""
 	TEMP_FILE=$($MKTEMP)
-	NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
+#	NFS_PATH="mtlfs03.yok.mtl.com:/vol/adams_test"
+	NFS_PATH="mtlzfs01:/export/icd_backend_work/backend4"
 	TIMESTAMP=$(date +%Y%m%d_%H:%M)
 	
 	# Data retention (days)
@@ -132,7 +133,8 @@ else
 	## Minimun file size to search (MB)
 	MINSIZE="499M"
 
-	MountPoint="/mnt/mtlfs03_adams_test_$$"
+#	MountPoint="/mnt/mtlfs03_adams_test_$$"
+	MountPoint="/mnt/mtlzfs01_backend4_$$"
 	FILESYSTEM="backend3"
 fi
 
